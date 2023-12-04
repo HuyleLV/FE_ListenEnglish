@@ -7,6 +7,7 @@ import Control from "../component/Control";
 export default function LessonDetail() {
 
     const [isPlaying, setisPlaying] = useState(false);
+    const [currentTime, setcurrentTime] = useState(0);
     const audioElem = useRef();
 
     const {
@@ -25,6 +26,8 @@ export default function LessonDetail() {
     const onPlaying = () => {
         const duration = audioElem.current.duration;
         const ct = audioElem.current.currentTime;
+        setcurrentTime(ct);
+        console.log(ct)
 
         // setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
     }
@@ -51,8 +54,8 @@ export default function LessonDetail() {
                     onPlay={play}
                     onPause={pause}
                     onReset={reset}
-                    current={currentMillisecond}
-                    setCurrent={setCurrentMillisecond}
+                    current={currentTime}
+                    setCurrent={setcurrentTime}
                     recoverAutoScrollImmediately={recoverAutoScrollImmediately}
                     isPlaying={isPlaying}
                     setisPlaying={setisPlaying}
@@ -65,7 +68,7 @@ export default function LessonDetail() {
                         )
 
                     }
-                    currentMillisecond={currentMillisecond}
+                    currentMillisecond={currentTime}
                     verticalSpace
                     recoverAutoScrollSingal={signal}
                     recoverAutoScrollInterval={5000}
