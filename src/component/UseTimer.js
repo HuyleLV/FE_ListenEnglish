@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 
 function useTimer(speed = 1) {
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
   const play = useCallback(() => setPaused(false), []);
   const pause = useCallback(() => setPaused(true), []);
 
