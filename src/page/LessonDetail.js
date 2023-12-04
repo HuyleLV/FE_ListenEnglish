@@ -26,7 +26,7 @@ export default function LessonDetail() {
     const onPlaying = () => {
         const duration = audioElem.current.duration;
         const ct = audioElem.current.currentTime;
-        setcurrentTime(ct);
+        setcurrentTime(ct * 1000);
         console.log(ct)
 
         // setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
