@@ -73,7 +73,7 @@ export default function LessonDetail() {
                     recoverAutoScrollSingal={signal}
                     recoverAutoScrollInterval={5000}
                     lrc={
-                        `[00:08.00]Hi, everyone.
+                        `[00:06.00]Hi, everyone.
 [00:10.23]I know you're all busy so I'll keep this briefing quick.
 [00:16.17]I have some important information about a change in the management team.
 [00:19.75]As you already know, our head of department, James Watson, is leaving his position at the end of this week.
