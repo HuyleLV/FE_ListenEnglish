@@ -3,12 +3,20 @@ import useTimer from "../component/UseTimer";
 import cd from "../component/icon/cd.png"
 import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
 import Control from "../component/Control";
+import { songsdata } from "../component/audio";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function LessonDetail() {
 
+    const { lesson_id } = useParams();
     const [isPlaying, setisPlaying] = useState(false);
     const [currentTime, setcurrentTime] = useState(0);
+    const [songs, setSongs] = useState(songsdata);
+    const [currentSong, setCurrentSong] = useState(songsdata[1]);
     const audioElem = useRef();
+    
+    const [dataLesson, setdataLesson] = useState([]);
 
     const {
       currentMillisecond,
@@ -29,28 +37,54 @@ export default function LessonDetail() {
         setcurrentTime(ct * 1000);
         console.log(ct)
 
-        // setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
+        setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
+    }
+
+
+    const lesson = async () => {
+        try {
+            await axios.get(`https://api.effortlessenglish.vip/lesson/getDetail/` + lesson_id)
+                .then(response => setdataLesson(response.data[0]));
+        } catch (error) {
+          console.error(error);
+        }
     }
 
     useEffect(() => {
+        console.log(dataLesson.mainStory);
+        lesson();
         if (isPlaying) {
             audioElem.current.play();
         } else {
             audioElem.current.pause();
         }
-    }, [isPlaying])
+    }, [isPlaying, dataLesson])
 
     return (
         <div class="max-w-screen-xl items-center mx-auto p-4">
-            <p className="text-4xl text-center py-10">Lear read English</p>
+            <p className="text-4xl text-center py-10">{dataLesson.title}</p>
             <div>
                 <audio
-                    src="https://6a63fca904fd268f15f7-d5770ffdd579eb31eaa89faeffc55fe7.ssl.cf1.rackcdn.com/LE_listening_A2_Morning_briefing.mp3"
+                    src={dataLesson.mainStoryAudio}
                     ref={audioElem}
                     onTimeUpdate={onPlaying}
-                    controls
                 />
-                <Control
+                <Lrc
+                    className="bg-sky-200 p-10"
+                    lineRenderer={({ active, line: { content } }) =>
+                        (
+                            active ? <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
+                        )
+
+                    }
+                    currentMillisecond={currentTime}
+                    verticalSpace
+                    recoverAutoScrollSingal={signal}
+                    recoverAutoScrollInterval={5000}
+                    lrc={"`"+ dataLesson.mainStory +"`"}
+                />
+                <Control 
                     onPlay={play}
                     onPause={pause}
                     onReset={reset}
@@ -59,26 +93,11 @@ export default function LessonDetail() {
                     recoverAutoScrollImmediately={recoverAutoScrollImmediately}
                     isPlaying={isPlaying}
                     setisPlaying={setisPlaying}
-                />
-                <Lrc
-                    lineRenderer={({ active, line: { content } }) =>
-                        (
-                            active ? <p active={active} className="text-green-600 font-bold">{content}</p>
-                                : <p active={active} className="text-neutral-900">{content}</p>
-                        )
-
-                    }
-                    currentMillisecond={currentTime}
-                    verticalSpace
-                    recoverAutoScrollSingal={signal}
-                    recoverAutoScrollInterval={5000}
-                    lrc={
-                        `[00:06.00]Hi, everyone.
-[00:10.23]I know you're all busy so I'll keep this briefing quick.
-[00:16.17]I have some important information about a change in the management team.
-[00:19.75]As you already know, our head of department, James Watson, is leaving his position at the end of this week.
-[00:23.37]His replacement is starting at the end of the next month.`
-                    }
+                    songs={songs} 
+                    setSongs={setSongs}
+                    audioElem={audioElem}
+                    currentSong={currentSong} 
+                    setCurrentSong={setCurrentSong}
                 />
             </div>
         </div>

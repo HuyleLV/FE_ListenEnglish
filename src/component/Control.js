@@ -2,6 +2,8 @@
 import React, { useRef } from 'react';
 import play from "../component/icon/play-button-arrowhead.png"
 import pause from "../component/icon/pause.png"
+import next from "../component/icon/next.png"
+import back from "../component/icon/back.png"
 
 function Control({
   onPlay,
@@ -11,7 +13,12 @@ function Control({
   setCurrent,
   recoverAutoScrollImmediately,
   isPlaying,
-  setisPlaying
+  setisPlaying,
+  songs,
+  setSongs,
+  audioElem,
+  currentSong,
+  setCurrentSong
 }) {
   const clickRef = useRef();
 
@@ -24,33 +31,43 @@ function Control({
     setisPlaying(!isPlaying);
   }
 
-  // const checkWidth = (e)=>
-  // {
-  //   let width = clickRef.current.clientWidth;
-  //   const offset = e.nativeEvent.offsetX;
+  const checkWidth = (e)=>
+  {
+    let width = clickRef.current.clientWidth;
+    const offset = e.nativeEvent.offsetX;
 
-  //   const divprogress = offset / width * 100;
-  //   audioElem.current.currentTime = divprogress / 100 * currentSong.length;
+    const divprogress = offset / width * 100;
+    audioElem.current.currentTime = divprogress / 100 * currentSong.length;
 
-  // }
+  }
 
   return (
-    <center>
-      {/* <div className="navigation">
-        <div className="navigation_wrapper" onClick={checkWidth} ref={clickRef}>
-          <div className="seek_bar" style={{width: `${currentSong.progress+"%"}`}}></div>
+    <>
+      <div className="w-full pt-5 px-2 bg-sky-500">
+        <div className="min-w-full bg-gray-200 h-[6px] rounded-full cursor-pointer" onClick={checkWidth} ref={clickRef}>
+          <div className="w-0 h-full bg-sky-600 rounded-[30px]" style={{width: `${currentSong.progress+"%"}`}}></div>
         </div>
-      </div> */}
-      {isPlaying ?
-        <button type="button" className='rounded-full p-4 bg-sky-600' onClick={PlayPause}>
-          <img src={pause} className='w-10 h-10'/>
-        </button>
-        :
-        <button type="button" className='mx-10 bg-sky-600 p-4 rounded-full' onClick={PlayPause}>
-          <img src={play} className='w-10 h-10'/>
-        </button>
-      }
-      <button type="button" className='bg-red-100 p-4 rounded-full' onClick={onReset}>
+      </div>
+      <center>
+        <div className='p-4 bg-sky-500'>
+          <button type="button" className='rounded-full p-3 bg-sky-600' onClick={PlayPause}>
+            <img src={back} className='w-10 h-10'/>
+          </button>
+          {isPlaying ?
+            <button type="button" className='mx-10 rounded-full p-4 bg-sky-600' onClick={PlayPause}>
+              <img src={pause} className='w-10 h-10'/>
+            </button>
+            :
+            <button type="button" className='mx-10 bg-sky-600 p-4 rounded-full' onClick={PlayPause}>
+              <img src={play} className='w-10 h-10'/>
+            </button>
+          }
+          <button type="button" className='rounded-full p-3 bg-sky-600' onClick={PlayPause}>
+            <img src={next} className='w-10 h-10'/>
+          </button>
+        </div>
+      </center>
+      {/* <button type="button" className='bg-red-100 p-4 rounded-full' onClick={onReset}>
         reset
       </button>
       <input
@@ -61,8 +78,8 @@ function Control({
       />
       <button type="button" onClick={recoverAutoScrollImmediately}>
         recover auto scroll immediately
-      </button>
-    </center>
+      </button> */}
+    </>
   );
 }
 

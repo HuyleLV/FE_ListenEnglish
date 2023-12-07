@@ -43,7 +43,7 @@ export default function Header() {
           <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 text-white md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
               <Link className="block py-2 pl-3 pr-4 md:p-0 md:hover:text-black" to={"/"}>
-                Kết quả miền bắc
+                Topic
               </Link>
             </li>
             <li>
@@ -51,15 +51,7 @@ export default function Header() {
                 className="block py-2 pl-3 pr-4 md:p-0 md:hover:text-black"
                 to={"so-xo-mien-nam"}
               >
-                Kết quả miền nam
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="block py-2 pl-3 pr-4 md:p-0 md:hover:text-black"
-                to={"so-xo-mien-trung"}
-              >
-                Kết quả miền trung
+                Bảng xếp hạng
               </Link>
             </li>
             <li>
@@ -71,7 +63,7 @@ export default function Header() {
                 }}
                 class="flex items-center justify-between w-full py-2 pl-3 pr-4 text-white rounded hover:bg-black md:hover:bg-transparent md:border-0 md:hover:text-black md:p-0 md:w-auto dark:text-white md:dark:hover:text-orange-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
               >
-                Kết quả xổ số 30 ngày
+                Trang cá nhân
                 <svg
                   class="w-2.5 h-2.5 ml-2.5"
                   aria-hidden="true"

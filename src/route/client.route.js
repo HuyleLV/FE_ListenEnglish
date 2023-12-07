@@ -8,7 +8,7 @@ export const Client = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/lesson/:topic_id" element={<Lesson />} />
-        <Route path="/lesson-detail/:lesson_id" element={<LessonDetail />} />
+        <Route path="/lesson/detail/:lesson_id" element={<LessonDetail />} />
       </Routes>
     );
   };
