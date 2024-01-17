@@ -7,7 +7,7 @@ import { songsdata } from "../component/audio";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-export default function LessonDetail() {
+export default function Speaking() {
 
     const { lesson_id } = useParams();
     const [isPlaying, setisPlaying] = useState(false);
@@ -72,10 +72,7 @@ export default function LessonDetail() {
                             className="bg-sky-200 p-10"
                             lineRenderer={({ active, line: { content } }) =>
                                 (
-                                    active ? 
-                                        <>
-                                            <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
-                                        </>
+                                    active ? <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
                                         : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
                                 )
 

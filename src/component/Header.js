@@ -47,6 +47,11 @@ export default function Header() {
               </Link>
             </li>
             <li>
+              <Link className="block py-2 pl-3 pr-4 md:p-0 md:hover:text-black" to={"/blog"}>
+                Blog
+              </Link>
+            </li>
+            <li>
               <Link
                 className="block py-2 pl-3 pr-4 md:p-0 md:hover:text-black"
                 to={"so-xo-mien-nam"}

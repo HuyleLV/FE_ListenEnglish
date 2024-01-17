@@ -5,11 +5,15 @@ import { Link } from 'react-router-dom';
 export default function Home() {
 
     const [dataTopic, setdataTopic] = useState([]);
+    const [pagination, setPagination] = useState({
+      page: 1,
+      pageSize: 12,
+    });
 
     const topic = async () => {
         try {
-          const response = await axios.get(`https://api.effortlessenglish.vip/topic/getAll`);
-          setdataTopic(response.data);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/topic/getAll`, {params: pagination});
+          setdataTopic(response?.data);
         } catch (error) {
           console.error(error);
         }
@@ -17,14 +21,14 @@ export default function Home() {
 
     useEffect(() => {
         topic();
-    });
+    },[]);
 
     return (
         <div class="max-w-screen-xl items-center mx-auto p-4">
             <p className="text-4xl text-center py-10">Tất cả chương trình học</p>
             <div class="grid grid-cols-4 gap-4 text-center pt-[40px] text-white">
 
-                {dataTopic.map((topic, index) => 
+                {dataTopic?.data?.map((topic, index) => 
                     <div class="col-span-1 bg-sky-600 rounded-xl" key={index}>
                         <Link to={"/lesson/" + topic.id}>
                             <div className="p-10">
