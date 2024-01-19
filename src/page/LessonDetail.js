@@ -41,7 +41,7 @@ export default function LessonDetail() {
 
     const lesson = async () => {
         try {
-            await axios.get(`https://api-v.effortlessenglish.vip/lesson/getDetail/` + lesson_id)
+            await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getDetail/` + lesson_id)
                 .then(response => setdataLesson(response.data[0]));
         } catch (error) {
           console.error(error);

@@ -1,4 +1,4 @@
-import { Image, Layout, Menu } from "antd";
+import { Image, Layout, Menu, message } from "antd";
 import React, { useEffect } from "react";
 import {
   MessageOutlined,
@@ -17,6 +17,12 @@ export default function CustomeSider() {
 
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies(['admin']);
+  
+  const logout = () => {
+    removeCookie("admin");
+    message.success("Đăng xuất thành công!")
+    navigate("/loginAdmin");
+  }
 
   const menuItem = [
     {
@@ -38,6 +44,16 @@ export default function CustomeSider() {
       key: "lesson",
       icon: <VideoCameraOutlined />,
       label: <Link to={"/admin/lesson"}>Quản lí Lesson</Link>,
+    },
+    {
+      key: "transfer",
+      icon: <VideoCameraOutlined />,
+      label: <Link to={"/admin/transfer"}>Quản lí Transfer</Link>,
+    },
+    {
+      key: "logout",
+      icon: <VideoCameraOutlined />,
+      label: <a onClick={()=>logout()}>Logout</a>,
     },
   ];
 

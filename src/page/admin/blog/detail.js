@@ -11,8 +11,7 @@ export default function BlogDetail() {
   const [initialValues, setInitialValues] = useState({});
   const params = useParams();
   const id = params?.blog_id;
-//   const [cookies, setCookie, removeCookie] = useCookies(['admin']);
-
+  const [cookies, setCookie, removeCookie] = useCookies(['admin']);
 
   const fetchBlog = async () => {
     await axios
@@ -49,7 +48,7 @@ export default function BlogDetail() {
   const onSubmit = async (values) => {
     const submitValues = {
       ...values,
-    //   create_by: cookies.admin?.user_id
+      create_by: cookies?.admin[0]?.id
     };
 
     try {

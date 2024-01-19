@@ -1,15 +1,12 @@
 import React from 'react';
 import { Button, Checkbox, Form, Input, message } from 'antd';
-import { useForm } from 'antd/es/form/Form';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginAdmin() {
-    const [form] = Form.useForm();
     const navigate = useNavigate();
     const [cookies, setCookie, removeCookie] = useCookies(['admin']);
-
 
     const onFinish = async(values) => {
         await axios

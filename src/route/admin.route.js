@@ -7,6 +7,7 @@ import LessonDashboard from "../page/admin/lesson";
 import TopicDashboard from "../page/admin/topic";
 import TopicDetail from "../page/admin/topic/detail";
 import LessonDetail from "../page/admin/lesson/detail";
+import TransferDetail from "../page/admin/transfer";
 
 export const Admin = () => {
     return (
@@ -17,6 +18,7 @@ export const Admin = () => {
         <Route path="/admin/lesson/:lesson_id" element={<LessonDetail />} />
         <Route path="/admin/topic" element={<TopicDashboard />} />
         <Route path="/admin/topic/:topic_id" element={<TopicDetail />} />
+        <Route path="/admin/transfer" element={<TransferDetail />} />
         <Route path="/admin/user" element={<UsersDashboard />} />
       </Routes>
     );

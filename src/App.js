@@ -13,10 +13,10 @@ function App() {
     return <DefaultLayoutAdmin />
   } else {
     return (
-      <div className="App bg-[#fafafa] h-full">
-        <Header />
-        <Client />
-      </div>
+        <div className="App bg-[#fafafa] h-full">
+          <Header />
+          <Client />
+        </div>
     );
   }
 }
