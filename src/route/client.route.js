@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "../page/Home";
 import Lesson from "../page/Lesson";
 import LessonDetail from "../page/LessonDetail";
 import Speaking from "../page/Speaking";
@@ -8,11 +7,14 @@ import Blog from "../page/Blog";
 import BlogDetail from "../page/BlogDetail";
 import Login from "../page/Login";
 import Profile from "../page/Profile";
+import Topic from "../page/Topic";
+import Home from "../page/Home";
 
 export const Client = () => {
     return (
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/topic" element={<Topic />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:blog_id" element={<BlogDetail />} />
         <Route path="/lesson/:topic_id" element={<Lesson />} />

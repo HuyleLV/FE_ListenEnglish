@@ -1,13 +1,15 @@
 import { googleLogout } from "@react-oauth/google";
 import { Button, Dropdown, message } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../component/image/logo.png"
 
 export default function Header() {
   const [openNav, setOpenNav] = React.useState(false);
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+  const location = useLocation()
 
   const logout = () => {
     googleLogout();
@@ -36,12 +38,11 @@ export default function Header() {
   ];
 
   return (
-    <nav class="sticky top-0 z-10 bg-sky-800 border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-      <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <nav class="sticky top-0 z-10 bg-white shadow-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div class="max-w-screen-xl flex flex-wrap bg-white items-center justify-between mx-auto p-5">
         <a href="/" class="flex items-center">
-          <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            Listen English
-          </span>
+          <img src={logo} className="w-10 h-10 rounded-full"/>
+          <p className="pl-2 text-red-700 font-bold text-xl">Effortless English</p>
         </a>
         <button
           data-collapse-toggle="navbar-dropdown"
@@ -69,14 +70,14 @@ export default function Header() {
           </svg>
         </button>
         <div class={`${openNav ? "" : "hidden"} w-full md:block md:w-auto`}>
-          <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 text-white md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 text-black-800 md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li className="pt-1">
-              <Link className="block md:p-0 md:hover:text-black" to={"/"}>
+              <Link className={location?.pathname.includes("/topic") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/topic"}>
                 Topic
               </Link>
             </li>
             <li className="pt-1">
-              <Link className="block md:p-0 md:hover:text-black" to={"/blog"}>
+              <Link className={location?.pathname.includes("/blog") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/blog"}>
                 Blog
               </Link>
             </li>
@@ -101,7 +102,7 @@ export default function Header() {
               </li>
               : 
               <li className="pt-1">
-                <Link className="block md:p-0 md:hover:text-black" to={"/login"}>
+                <Link className={location?.pathname.includes("/login") ?"block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/login"}>
                   Login
                 </Link>
               </li>

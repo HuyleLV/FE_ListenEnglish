@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import google from "../component/image/google.png";
 import { GoogleLogin, GoogleOAuthProvider, GoogleOAuthenProvider, googleLogout } from '@react-oauth/google';
+import Footer from "../component/Footer";
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -48,65 +49,68 @@ const Login = () => {
   };
 
   return (
-    <div className="pb-[100px] pt-[50px]">
-      <div className="mb-[10px]">
-        <div className="pt-[20px] text-[40px] text-[var(--red)] flex justify-center">
-          Sign in
+    <>
+      <div className="pb-[150px] pt-[50px]">
+        <div className="mb-[10px]">
+          <div className="pt-[20px] text-[40px] text-[var(--red)] flex justify-center">
+            Sign in
+          </div>
         </div>
-      </div>
-      <Row justify={"center"} align={"middle"} style={{ height: "300px" }}>
-        <Col lg={14} xs={22} style={{ maxWidth: 380 }}>
-          <Form
-            onFinish={loginUser}
-            onFinishFailed={onFinishFailed} 
-            name="basic" 
-            layout={"vertical"} 
-            colon={false}>
-            <Form.Item name="email">
-              <Input
-                className="!rounded-none p-[10px]"
-                size={"large"}
-                placeholder="Login"
-              />
-            </Form.Item>
-            <Form.Item name="password" className="mt-[-6px]">
-              <Input.Password
-                className="!rounded-none p-[10px]"
-                size={"large"}
-                placeholder="Password"
-              />
-            </Form.Item>
-            <Button
-              style={{
-                background: "white",
-                width: "100%",
-                height: 40,
-                marginTop: 10
-              }}
-              size={"large"}
-              htmlType="submit"
-              shape="round"
-              onClick={loginUser}
-            >
-              <span className="font-semibold text-lg">Log in</span>
-            </Button>
-
-            <div className="mt-4 flex justify-center">
-              <GoogleOAuthProvider clientId="750712194074-i97s9pu85722m8rs0rjt6vki2fr4v6fm.apps.googleusercontent.com">
-                <GoogleLogin
-                  onSuccess={loginGmail}
-                  onError={(err)=>console.log(err)}
-                  shape="pill"
-                  theme="outline"
-                  size="large"
-                  width={"380px"}
+        <Row justify={"center"} align={"middle"} style={{ height: "300px" }}>
+          <Col lg={14} xs={22} style={{ maxWidth: 380 }}>
+            <Form
+              onFinish={loginUser}
+              onFinishFailed={onFinishFailed} 
+              name="basic" 
+              layout={"vertical"} 
+              colon={false}>
+              <Form.Item name="email">
+                <Input
+                  className="!rounded-none p-[10px]"
+                  size={"large"}
+                  placeholder="Login"
                 />
-              </GoogleOAuthProvider>
-            </div>
-          </Form>
-        </Col>
-      </Row>
-    </div>
+              </Form.Item>
+              <Form.Item name="password" className="mt-[-6px]">
+                <Input.Password
+                  className="!rounded-none p-[10px]"
+                  size={"large"}
+                  placeholder="Password"
+                />
+              </Form.Item>
+              <Button
+                style={{
+                  background: "white",
+                  width: "100%",
+                  height: 40,
+                  marginTop: 10
+                }}
+                size={"large"}
+                htmlType="submit"
+                shape="round"
+                onClick={loginUser}
+              >
+                <span className="font-semibold text-lg">Log in</span>
+              </Button>
+
+              <div className="mt-4 flex justify-center">
+                <GoogleOAuthProvider clientId="750712194074-i97s9pu85722m8rs0rjt6vki2fr4v6fm.apps.googleusercontent.com">
+                  <GoogleLogin
+                    onSuccess={loginGmail}
+                    onError={(err)=>console.log(err)}
+                    shape="pill"
+                    theme="outline"
+                    size="large"
+                    width={"380px"}
+                  />
+                </GoogleOAuthProvider>
+              </div>
+            </Form>
+          </Col>
+        </Row>
+      </div>
+      {Footer()}
+    </>
   );
 };
 

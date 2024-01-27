@@ -43,9 +43,13 @@ export default function TransferDetail() {
     });
   };
 
-  const updateTransfer = async (value, id) => {
+  const updateTransfer = async (value, id, user_id, vip_expire_at) => {
     await axios
-      .post(`${process.env.REACT_APP_API_URL}/transfer/update/${id}`, {transfer_status: value})
+      .post(`${process.env.REACT_APP_API_URL}/transfer/update/${id}`, {
+        user_id: user_id,
+        transfer_status: value,
+        vip_expire_at: dayjs(vip_expire_at).format("YYYY-MM-DD")
+      })
       .finally(() => {
         fetchTransfer();
         message.success("Cập nhập thành công!");
@@ -105,7 +109,7 @@ export default function TransferDetail() {
                 className={"w-[150px]"}
                 value={record?.transfer_status === 1 ? "Chờ xác nhận" : "Xác nhận"}
                 defaultValue={record?.transfer_status === 1 ? "Chờ xác nhận" : "Xác nhận"}
-                onChange={(value) => updateTransfer(value, record?.transfer_id)}
+                onChange={(value) => updateTransfer(value, record?.transfer_id, record?.id, record?.vip_expire_at)}
                 />
         </div>
       ),
