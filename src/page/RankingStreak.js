@@ -30,23 +30,23 @@ export default function RankingStreak() {
             <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
                 <p className="text-4xl text-center font-semibold py-10">Bảng xếp hạng Streak</p>
                 <div className='flex justify-center bg-red-100 p-10 rounded-xl'>
-                    <table className='w-[1200px]'>
+                    <table className={isMobile ? '' : 'w-[1200px]'}>
                         <thead className='bg-red-600 text-white'>
                             <tr>
-                                <th className='px-10 py-2'>Rank</th>
-                                <th className='px-10'>Avatar</th>
-                                <th className='px-10'>Full name</th>
-                                <th className='px-10'>Streak hiện tại</th>
+                                <th className={isMobile? 'px-2' : 'px-10 py-2'}>Rank</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Avatar</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Full name</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Streak hiện tại</th>
                             </tr>
                         </thead>
                         <tbody className='text-center'>
                             {dataRankStreak?.map((_, index) => 
                                 <tr className='p-5'>    
                                     <td>{index+1}</td>
-                                    <td className='flex justify-center py-5'><img src={_?.avatar ? _?.avatar : logo} className='w-[70px] rounded-full'/></td>
+                                    <td className='flex justify-center py-5'><img src={_?.avatar ? _?.avatar : logo} className={isMobile? 'w-[30px] rounded-full' : 'w-[70px] rounded-full'}/></td>
                                     <td className='font-semibold'>{_?.username}</td>
                                     <td>
-                                        <div className='flex justify-center'>
+                                        <div className={isMobile ? 'flex justify-center w-[100px]' : 'flex justify-center'}>
                                             <p className='px-2'>{_?.longest_streak}</p>
                                             <img src={fire} width={"20px"}/>
                                         </div>

@@ -40,20 +40,20 @@ export default function RankingTimer() {
                     <table className='w-[1200px]'>
                         <thead className='bg-red-600 text-white'>
                             <tr>
-                                <th className='px-10 py-2'>Rank</th>
-                                <th className='px-10'>Avatar</th>
-                                <th className='px-10'>Full name</th>
-                                <th className='px-10'>Streak hiện tại</th>
+                                <th className={isMobile? 'px-2' : 'px-10 py-2'}>Rank</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Avatar</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Full name</th>
+                                <th className={isMobile? 'px-2' : 'px-10'}>Time hiện tại</th>
                             </tr>
                         </thead>
                         <tbody className='text-center'>
                             {dataRankStreak?.map((_, index) => 
                                 <tr className='p-5'>    
                                     <td>{index+1}</td>
-                                    <td className='flex justify-center py-5'><img src={_?.avatar ? _?.avatar : logo} className='w-[70px] rounded-full'/></td>
+                                    <td className='flex justify-center py-5'><img src={_?.avatar ? _?.avatar : logo} className={isMobile? 'w-[30px] rounded-full' : 'w-[70px] rounded-full'}/></td>
                                     <td className='font-semibold'>{_?.username}</td>
                                     <td>
-                                        <p className='px-2'>{ Math.floor(_?.duration % 86400 / 3600) + "h " + Math.floor(_?.duration % 86400 % 3600 / 60) + "m " + Math.floor(_?.duration % 86400 % 3600 % 60) + "s"}</p>
+                                        <p className={isMobile? 'w-[100px]' : 'px-2'}>{ Math.floor(_?.duration % 86400 / 3600) + "h " + Math.floor(_?.duration % 86400 % 3600 / 60) + "m " + Math.floor(_?.duration % 86400 % 3600 % 60) + "s"}</p>
                                     </td>
                                 </tr>
                             )}
