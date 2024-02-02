@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Image, Row, Col, Space, Table, Pagination, message, Modal, Select } from "antd";
+import { Form, Input, Button, Image, Row, Col, Space, Table, Pagination, message, Modal, Select, Progress } from "antd";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import dayjs from "dayjs";
 import { WarningOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Paragraph from "antd/es/typography/Paragraph";
+import Footer from "../component/Footer";
 
 export default function Profile() {
   const [cookies] = useCookies(["user"]);
   const [form] = Form.useForm();
   const [profile, setProfile] = useState({});
   const [transfer, setTransfer] = useState([]);
+  const [streak, setStreak] = useState([]);
   const [editProfile, setEditProfile] = useState(false);
   const [pricePackage, setPricePackage] = useState("");
   const navigate = useNavigate();
@@ -30,6 +32,22 @@ export default function Profile() {
         setTransfer(data);
       });
   };
+
+  const getUserStreak = async () => {
+    await axios.get(
+      `${process.env.REACT_APP_API_URL}/user/me`,
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cookies?.user?.token}`
+        }
+      }
+    ).then(( res ) => {
+      const data = res?.data;
+      setStreak(data);
+    });
+  }
 
   const vip_expire_at = (pricePackage) => {
     const today = new Date();
@@ -181,161 +199,244 @@ export default function Profile() {
     fetchTransfer()
   }, [pagination]);
 
+  useEffect(() => {
+    if(cookies?.user) {
+      getUserStreak();
+    } 
+  }, [cookies?.user]);
+
   return (
-    <div className="my-[60px]">
-      <Row justify={"center"} align={"middle"}>
-        <Col
-          lg={20}
-          xs={24}
-          className="p-[20px] border border-[var(--mid-gray)] rounded"
-        >
-        <Form
-          layout={"vertical"}
-          colon={false}
-          form={form}
-          initialValues={profile}
-          onFinishFailed={(e) => console.log(e)}
-          onFinish={onSubmit}
-        >
-          <Row gutter={20}>
-            <Col>
-              <Image
-                preview={false}
-                src={cookies?.user?.avatar}
-                width={120}
-                height={120}
-              />
-            </Col>
-            <Col>
-              <div className="text-[26px] font-medium">
-                {cookies?.user?.username}
-              </div>
-              <div className="text-[18px] font-normal">{cookies?.user?.email}</div>
-              <Button
-                type={"primary"}
-                className="bg-blue-500 mt-4"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Update Vip
-              </Button>
-            </Col>
-          </Row>
-          <Row xs={24} lg={12} className="pt-10">
-            {!editProfile ? (
-              <>
-                <Form.Item label="Password" className="w-[300px]">
-                  <Input
-                    disabled={!editProfile}
-                    size="large"
-                    placeholder="*********"
-                  />
-                </Form.Item>
-              </>
-            ) : (
-              <>
-                <Col xs={24} xl={8}>
-                  <Form.Item label="Password New" name="passwordNew" className="w-[300px]">
-                    <Input
-                      disabled={!editProfile}
-                      size="large"
-                      placeholder="*********"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} xl={8}>
-                  <Form.Item label="Confirm Password" name="comfirmPassword" className="w-[300px]">
-                    <Input
-                      disabled={!editProfile}
-                      size="large"
-                      placeholder="*********"
-                    />
-                  </Form.Item>
-                </Col>
-              </>
-            )}
-            <Col xs={24}>
-              <Space>
+    <>
+      <div className="py-[60px]">
+        <Row justify={"center"} align={"middle"}>
+          <Col
+            lg={20}
+            xs={24}
+            className="p-[20px] border border-[var(--mid-gray)] rounded"
+          >
+          <Form
+            layout={"vertical"}
+            colon={false}
+            form={form}
+            initialValues={profile}
+            onFinishFailed={(e) => console.log(e)}
+            onFinish={onSubmit}
+          >
+            <Row gutter={20}>
+              <Col>
+                <Image
+                  preview={false}
+                  src={cookies?.user?.avatar}
+                  width={120}
+                  height={120}
+                />
+              </Col>
+              <Col>
+                <div className="text-[26px] font-medium">
+                  {cookies?.user?.username}
+                </div>
+                <div className="text-[18px] font-normal">{cookies?.user?.email}</div>
                 <Button
                   type={"primary"}
-                  className="bg-blue-500"
-                  onClick={() => setEditProfile(!editProfile)}
+                  className="bg-blue-500 mt-4"
+                  onClick={() => setIsModalOpen(true)}
                 >
-                  Edit profile
+                  Update Vip
                 </Button>
-                {editProfile && (
-                  <Button 
+              </Col>
+            </Row>
+            <Row xs={24} lg={12} className="pt-10">
+              {!editProfile ? (
+                <>
+                  <Form.Item label="Password" className="w-[300px]">
+                    <Input
+                      disabled={!editProfile}
+                      size="large"
+                      placeholder="*********"
+                    />
+                  </Form.Item>
+                </>
+              ) : (
+                <>
+                  <Col xs={24} xl={8}>
+                    <Form.Item label="Password New" name="passwordNew" className="w-[300px]">
+                      <Input
+                        disabled={!editProfile}
+                        size="large"
+                        placeholder="*********"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} xl={8}>
+                    <Form.Item label="Confirm Password" name="comfirmPassword" className="w-[300px]">
+                      <Input
+                        disabled={!editProfile}
+                        size="large"
+                        placeholder="*********"
+                      />
+                    </Form.Item>
+                  </Col>
+                </>
+              )}
+              <Col xs={24}>
+                <Space>
+                  <Button
                     type={"primary"}
-                    className="bg-blue-500" 
-                    htmlType={"submit"}>
-                    Save
+                    className="bg-blue-500"
+                    onClick={() => setEditProfile(!editProfile)}
+                  >
+                    Edit profile
                   </Button>
-                )}
-              </Space>
+                  {editProfile && (
+                    <Button 
+                      type={"primary"}
+                      className="bg-blue-500" 
+                      htmlType={"submit"}>
+                      Save
+                    </Button>
+                  )}
+                </Space>
+              </Col>
+            </Row>
+          </Form>
+          </Col>
+          {transfer?.data?.length > 0 && (
+            <Col
+              lg={20}
+              xs={24}
+              className="p-[20px] mt-5 border border-[var(--mid-gray)] rounded"
+            >
+              <p className="font-bold py-5 text-center text-xl">Lệnh chuyển tiền</p>
+              <Table 
+                className={"custom-table pb-10"}
+                rowKey={(record) => record?.transfer_id + ""}
+                dataSource={transfer?.data} 
+                columns={columns} 
+                pagination={false}
+              />
+              <Pagination
+                className="flex justify-center"
+                current={pagination.page}
+                total={transfer?.total}
+                pageSize={pagination.pageSize}
+                onChange={(p)=> {
+                  setPagination({
+                    page: p,
+                    pageSize: pagination.pageSize
+                  })
+                }}
+              />
             </Col>
-          </Row>
-        </Form>
-        </Col>
-        <Col
-          lg={20}
-          xs={24}
-          className="p-[20px] mt-5 border border-[var(--mid-gray)] rounded"
-        >
-          <Table 
-            className={"custom-table pb-10"}
-            rowKey={(record) => record?.transfer_id + ""}
-            dataSource={transfer?.data} 
-            columns={columns} 
-            pagination={false}
-          />
-          <Pagination
-            className="flex justify-center"
-            current={pagination.page}
-            total={transfer?.total}
-            pageSize={pagination.pageSize}
-            onChange={(p)=> {
-              setPagination({
-                page: p,
-                pageSize: pagination.pageSize
-              })
-            }}
-          />
-        </Col>
-      </Row>
-      <Modal 
-        title="Update Vip" 
-        style={{
-          top: 50,
-        }}
-        open={isModalOpen} 
-        onOk={postTransfer} 
-        onCancel={()=>setIsModalOpen(false)} 
-        okText="Money transferred"
-        okButtonProps={{className: "bg-blue-500"}}
-      >
-        <p>Select package:</p>
-        <Select
+          )}
+          <Col
+            lg={20}
+            xs={24}
+            className="p-[20px] mt-5 border border-[var(--mid-gray)] rounded"
+          >
+            <p className="font-bold py-5 text-center text-xl">Thời gian học</p>
+
+            <Progress className="flex justify-center py-5 font-bold" type="circle" percent={66} />
+            <Row className="text-center">
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Streak hiện tại</p>
+                  <p className="font-semibold text-2xl">{streak?.current_streak}</p>
+                </div>
+              </Col>
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Streak dài nhất</p>
+                  <p className="font-semibold text-2xl">{streak?.longest_streak}</p>
+                </div>
+              </Col>
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Bản ghi âm</p>
+                  <p className="font-semibold text-2xl">{streak?.total_records}</p>
+                </div>
+              </Col>
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Chính xác</p>
+                  <p className="font-semibold text-2xl">{streak?.total_records !== 0 ? Math.floor(streak?.points / streak?.total_records) : 0}</p>
+                </div>
+              </Col>
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Tuần này</p>
+                  <p className="font-semibold text-2xl">
+                    {
+                      streak?.this_week 
+                      ? Math.floor(streak?.this_week % 86400 / 3600) + "h " + Math.floor(streak?.this_week % 86400 % 3600 / 60) + "m " + Math.floor(streak?.this_week % 86400 % 3600 % 60) + "s" 
+                      : "0h 0m 0s"
+                    }
+                  </p>
+                </div>
+              </Col>
+              <Col
+                xs={24} xl={6}
+              >
+                <div className="bg-red-200 p-4 m-2 rounded-xl">
+                  <p className="font-semibold text-lg">Tháng này</p>
+                  <p className="font-semibold text-2xl">
+                    {
+                      streak?.this_month
+                      ? Math.floor(streak?.this_month % 86400 / 3600) + "h " + Math.floor(streak?.this_month % 86400 % 3600 / 60) + "m " + Math.floor(streak?.this_month % 86400 % 3600 % 60) + "s" 
+                      : "0h 0m 0s"
+                    }
+                  </p>
+                </div>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Modal 
+          title="Update Vip" 
           style={{
-            width: 200,
+            top: 50,
           }}
-          defaultValue={"choose Package"}
-          onChange={(i)=>setPricePackage(i)}
-          options={[
-            {
-              value: "80000",
-              label: '1 month',
-            },
-            {
-              value: "600000",
-              label: '1 year',
-            },
-            { 
-              value: "1400000",
-              label: '5 year',
-            },
-          ]}
-        />
-        {handleProvinceChange(pricePackage)}
-      </Modal>
-    </div>
+          open={isModalOpen} 
+          onOk={postTransfer} 
+          onCancel={()=>setIsModalOpen(false)} 
+          okText="Money transferred"
+          okButtonProps={{className: "bg-blue-500"}}
+        >
+          <p>Select package:</p>
+          <Select
+            style={{
+              width: 200,
+            }}
+            defaultValue={"choose Package"}
+            onChange={(i)=>setPricePackage(i)}
+            options={[
+              {
+                value: "80000",
+                label: '1 month',
+              },
+              {
+                value: "600000",
+                label: '1 year',
+              },
+              { 
+                value: "1400000",
+                label: '5 year',
+              },
+            ]}
+          />
+          {handleProvinceChange(pricePackage)}
+        </Modal>
+      </div>
+      {Footer()}
+    </>
   );
 }

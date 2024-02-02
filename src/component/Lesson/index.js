@@ -136,7 +136,6 @@ export default function LessonForm({
                     <Form.Item
                         label={"miniStory"}
                         name="miniStory"
-                        rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
                     >
                         <TextArea placeholder={"Nhập"} style={{height: "500px"}}/>
                     </Form.Item>
@@ -144,7 +143,6 @@ export default function LessonForm({
                         className="flex justify-center"
                         label={"miniStory Audio"}
                         name="miniStoryAudio"
-                        rules={[{ required: true, message: "Vui lòng chọn audio!" }]}
                     >
                         <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif" />
                     </Form.Item>

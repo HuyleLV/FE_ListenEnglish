@@ -1,5 +1,5 @@
 import { message } from 'antd'
-import Cookies from 'js-cookie'
+import Cookies from 'react-cookie'
 import axios from 'axios'
 import { createBrowserHistory } from 'history';
 

@@ -1,5 +1,5 @@
 import { googleLogout } from "@react-oauth/google";
-import { Button, Dropdown, message } from "antd";
+import { Button, Dropdown, Menu, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -82,12 +82,24 @@ export default function Header() {
               </Link>
             </li>
             <li className="pt-1">
-              <Link
-                className="block md:p-0 md:hover:text-black"
-                to={"so-xo-mien-nam"}
+              <Dropdown
+                dropdownRender={(menu) => (
+                  <div className="bg-white rounded-xl p-4 shadow-xl">
+                    <Link className="block text-black font-semibold pb-1" to={"/ranking/streak"}>
+                      BXH Streak
+                    </Link>
+                    <Link className="blocktext-black font-semibold" to={"/ranking/timer"}>
+                      BXH Timer
+                    </Link>
+                  </div>
+                )}
+                placement="bottom"
+                trigger={['click']}
               >
-                Charts
-              </Link>
+                <Link className={location?.pathname.includes("/ranking") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"}>
+                  Ranking
+                </Link>
+              </Dropdown>
             </li>
             {cookies?.user ?
               <li>

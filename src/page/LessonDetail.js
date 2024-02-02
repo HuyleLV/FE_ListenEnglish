@@ -12,11 +12,13 @@ import parse from "html-react-parser";
 import { useDevice } from "../hooks/useDevice";
 import { useCookies } from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
+import { Segmented } from 'antd';
 
 export default function LessonDetail() {
 
     const { lesson_id } = useParams();
     const { isMobile } = useDevice();
+    const [story, setStory] = useState("Main Story");
     const navigate = useNavigate();
     const [isPlaying, setisPlaying] = useState(false);
     const [currentTime, setcurrentTime] = useState(0);
@@ -110,14 +112,27 @@ export default function LessonDetail() {
                         },
                     ]}
                 />
-                <p className="text-4xl font-semibold text-center py-10">{dataLesson?.title}</p>
+                <p className="text-4xl font-semibold text-center pt-10">{dataLesson?.title}</p>
+                <Segmented 
+                    className="my-[20px]" 
+                    options={['Main Story', 'Vocabulary', 'Mini Story']} 
+                    value={story}
+                    onChange={(e)=>setStory(e)}
+                    block />
                 <div>
                     <audio
-                        src={dataLesson.mainStoryAudio}
+                        src={story === "Main Story" 
+                        ? dataLesson?.mainStoryAudio 
+                        : story === "Vocabulary" 
+                            ? dataLesson?.vocabularyAudio
+                            : story === "Mini Story" 
+                                ? dataLesson?.miniStoryAudio
+                                : null
+                        }
                         ref={audioElem}
                         onTimeUpdate={onPlaying}
                     />
-                    {dataLesson.mainStory   ?
+                    {dataLesson?.mainStory && story === "Main Story"  ?
                         <>
                             <Lrc
                                 className="bg-red-100 p-10"
@@ -135,7 +150,49 @@ export default function LessonDetail() {
                                 verticalSpace
                                 recoverAutoScrollSingal={signal}
                                 recoverAutoScrollInterval={5000}
-                                lrc={dataLesson.mainStory}
+                                lrc={dataLesson?.mainStory}
+                            />
+                        </>
+                        : story === "Vocabulary" ?
+                        <>
+                            <Lrc
+                                className="bg-red-100 p-10"
+                                lineRenderer={({ active, line: { content } }) =>
+                                    (
+                                        active ? 
+                                            <>
+                                                <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                            </>
+                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
+                                    )
+
+                                }
+                                currentMillisecond={currentTime}
+                                verticalSpace
+                                recoverAutoScrollSingal={signal}
+                                recoverAutoScrollInterval={5000}
+                                lrc={dataLesson?.vocabulary}
+                            />
+                        </>
+                        : dataLesson?.miniStory && story === "Mini Story" ?
+                        <>
+                            <Lrc
+                                className="bg-red-100 p-10"
+                                lineRenderer={({ active, line: { content } }) =>
+                                    (
+                                        active ? 
+                                            <>
+                                                <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                            </>
+                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
+                                    )
+
+                                }
+                                currentMillisecond={currentTime}
+                                verticalSpace
+                                recoverAutoScrollSingal={signal}
+                                recoverAutoScrollInterval={5000}
+                                lrc={dataLesson?.miniStory}
                             />
                         </>
                         : <></>
