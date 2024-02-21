@@ -51,24 +51,32 @@ export default function Lesson() {
                                 <div className="grid grid-cols-2">
                                     {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD") && cookies?.user?.vip_expire_at !== null
                                     ?
-                                        <Link to={"/lesson/detail/"+ lesson?.id}>
-                                            <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
-                                                Audio
-                                            </div>
-                                        </Link>
+                                        <>
+                                            <Link to={"/lesson/detail/"+ lesson?.id}>
+                                                <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
+                                                    Audio
+                                                </div>
+                                            </Link>
+                                            <Link to={"/lesson/speaking/"+ lesson?.id}>
+                                                <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
+                                                    Speaking
+                                                </div>
+                                            </Link>
+                                        </>
                                     : 
-                                        <Link onClick={()=>setIsModalOpen(true)}>
-                                            <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
-                                                Audio
-                                            </div>
-                                        </Link>
+                                        <>
+                                            <Link onClick={()=>setIsModalOpen(true)}>
+                                                <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
+                                                    Audio
+                                                </div>
+                                            </Link>
+                                            <Link onClick={()=>setIsModalSpeakOpen(true)}>
+                                                <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
+                                                    Speaking
+                                                </div>
+                                            </Link>
+                                        </>
                                     }
-                                    
-                                    <Link onClick={()=>setIsModalSpeakOpen(true)}>
-                                        <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
-                                            Speaking
-                                        </div>
-                                    </Link>
                                 </div>
                         </div>
                     )}

@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Lesson from "../page/Lesson";
 import LessonDetail from "../page/LessonDetail";
-import Speaking from "../page/Speaking";
 import LoginAdmin from "../page/admin/login";
 import Blog from "../page/Blog";
 import BlogDetail from "../page/BlogDetail";
@@ -11,6 +10,7 @@ import Topic from "../page/Topic";
 import Home from "../page/Home";
 import RankingStreak from "../page/RankingStreak";
 import RankingTimer from "../page/RankingTimer";
+import Speaking from "../page/Speaking";
 
 export const Client = () => {
     return (

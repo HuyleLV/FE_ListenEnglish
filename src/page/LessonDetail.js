@@ -149,7 +149,7 @@ export default function LessonDetail() {
                                 currentMillisecond={currentTime}
                                 verticalSpace
                                 recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
+                                recoverAutoScrollInterval={20000}
                                 lrc={dataLesson?.mainStory}
                             />
                         </>
