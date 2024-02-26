@@ -82,6 +82,11 @@ export default function Header() {
               </Link>
             </li>
             <li className="pt-1">
+              <Link className={location?.pathname.includes("/playlist") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/playlist"}>
+                Playlist
+              </Link>
+            </li>
+            <li className="pt-1">
               <Dropdown
                 dropdownRender={(menu) => (
                   <div className="bg-white rounded-xl p-4 shadow-xl">

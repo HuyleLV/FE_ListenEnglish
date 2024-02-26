@@ -70,7 +70,7 @@ export default function Lesson() {
                                                     Audio
                                                 </div>
                                             </Link>
-                                            <Link onClick={()=>setIsModalSpeakOpen(true)}>
+                                            <Link onClick={()=>setIsModalOpen(true)}>
                                                 <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
                                                     Speaking
                                                 </div>
