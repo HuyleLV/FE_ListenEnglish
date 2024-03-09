@@ -51,6 +51,20 @@ export default function TopicDashboard() {
           render: (_, record) => <div>{record?.title}</div>,
         },
         {
+            title: <div className={"base-table-cell-label"}>Slug</div>,
+            key: "slug",
+            dataIndex: "slug",
+            width: 200,
+            render: (_, record) => <div>{record?.slug}</div>,
+        },
+        {
+            title: <div className={"base-table-cell-label"}>Ảnh</div>,
+            key: "blog_image",
+            dataIndex: "blog_image",
+            width: 200,
+            render: (_, record) => <div><Image src={record?.image_url} width={50}/></div>,
+        },
+        {
             title: <div className={"base-table-cell-label "}>Ngày tạo</div>,
             key: "create_at",
             dataIndex: "create_at",
@@ -73,7 +87,7 @@ export default function TopicDashboard() {
           render: (_, record) => {
             return (
               <Link
-                to={`/admin/topic/${record?.id}`}
+                to={`/admin/topic/${record?.slug}`}
                 className={"text-[var(--blue)]"}
               >
                 <EditOutlined />

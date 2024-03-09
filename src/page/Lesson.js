@@ -9,7 +9,7 @@ import dayjsInstance from "../utils/dayjs";
 
 export default function Lesson() {
 
-    const { topic_id } = useParams();
+    const { slug } = useParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalSpeakOpen, setIsModalSpeakOpen] = useState(false);
     const [dataLesson, setdataLesson] = useState([]);
@@ -21,7 +21,7 @@ export default function Lesson() {
 
     const lesson = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getByIdTopic/${topic_id}`, {params: pagination});
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlugTopic/${slug}`, {params: pagination});
           setdataLesson(response?.data[0]);
         } catch (error) {
           console.error(error);
@@ -38,7 +38,7 @@ export default function Lesson() {
                 <p className="text-4xl text-center py-10">{dataLesson?.title}</p>
 
                 <div class="grid grid-cols-4 gap-4 text-center pt-[40px] text-white h-full">
-                    {dataLesson?.lesson?.map((lesson, index) => 
+                    {dataLesson?.lesson?.map((lesson, index) =>
                         <div class="col-span-1 text-center pt-[40px] text-white" key={index}>
                                 <div class="bg-gradient-to-r from-red-500 to-red-800 rounded-t-md">
                                     <div className="p-5">
@@ -49,21 +49,21 @@ export default function Lesson() {
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2">
-                                    {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD") && cookies?.user?.vip_expire_at !== null
+                                    {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") < dayjsInstance(Date())?.format("YYYY-MM-DD") || cookies?.user?.vip_expire_at !== null
                                     ?
                                         <>
-                                            <Link to={"/lesson/detail/"+ lesson?.id}>
+                                            <Link to={"/lesson/detail/"+ lesson?.slug}>
                                                 <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
                                                     Audio
                                                 </div>
                                             </Link>
-                                            <Link to={"/lesson/speaking/"+ lesson?.id}>
+                                            <Link to={"/lesson/speaking/"+ lesson?.slug}>
                                                 <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
                                                     Speaking
                                                 </div>
                                             </Link>
                                         </>
-                                    : 
+                                    :
                                         <>
                                             <Link onClick={()=>setIsModalOpen(true)}>
                                                 <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
@@ -81,7 +81,7 @@ export default function Lesson() {
                         </div>
                     )}
                 </div>
-                
+
                 <Pagination
                     className="flex justify-center pt-[50px]"
                     current={pagination.page}
@@ -96,7 +96,7 @@ export default function Lesson() {
                 />
             </div>
             {Footer()}
-            
+
             <Modal open={isModalOpen} onOk={()=>setIsModalOpen(false)} onCancel={()=>setIsModalOpen(false)} okButtonProps={{ className: "bg-blue-500" }}>
                 <p className="text-xl font-bold py-2 pt-8">Vui lòng truy cập vào profile và </p>
                 <p className="text-xl font-bold py-2 pb-8">đăng ký gói vip để được sử dụng dịch vụ này</p>

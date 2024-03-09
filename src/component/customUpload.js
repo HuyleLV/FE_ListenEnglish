@@ -26,7 +26,7 @@ export default function CustomUpload({
 
   const uploadFile = async (file) => {
     const uploadForm = new FormData();
-      uploadForm.append("blog_image", file);
+      uploadForm.append("image_url", file);
       const result = await axios.post(
         `${process.env.REACT_APP_API_URL}/uploadImage`,
         uploadForm

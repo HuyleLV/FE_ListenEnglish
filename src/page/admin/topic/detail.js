@@ -10,11 +10,11 @@ export default function TopicDetail() {
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({});
   const params = useParams();
-  const id = params?.topic_id;
+  const slug = params?.slug;
 
   const fetchTopic = async () => {
     await axios
-      .get(`${process.env.REACT_APP_API_URL}/topic/getById/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/topic/getBySlug/${slug}`)
       .then((res) => {
         const data = res?.data[0];
         const values = {
@@ -39,10 +39,10 @@ export default function TopicDetail() {
   };
 
   useEffect(() => {
-    if (id && id !== "create") {
+    if (slug && slug !== "create") {
         fetchTopic();
     }
-  }, [id]);
+  }, [slug]);
 
   const onSubmit = async (values) => {
     const submitValues = {
@@ -51,9 +51,9 @@ export default function TopicDetail() {
     };
 
     try {
-      if (id && id !== "create") {
-        await updateTopic(id, submitValues);
-        message.success("Cập nhập thành công");
+      if (slug && slug !== "create") {
+        await updateTopic(initialValues?.id, submitValues);
+        message.success("Cập nhật thành công");
       } else {
         await createTopic(submitValues);
         message.success("Tạo mới thành công");
@@ -61,17 +61,19 @@ export default function TopicDetail() {
       navigate("/admin/topic");
     } catch (error) {
       console.log(error);
+      message.error("Slug đã được sử dụng");
+
     }
   };
 
   useEffect(() => {
-    if (id) fetchTopic();
+    if (slug) fetchTopic();
         form.resetFields();
-  }, [form, id]);
+  }, [form, slug]);
 
   return (
     <TopicForm
-      id={id !== "create" ? id : undefined}
+      id={slug !== "create" ? initialValues?.id : undefined}
       initialValues={initialValues}
       onSubmit={onSubmit}
     />

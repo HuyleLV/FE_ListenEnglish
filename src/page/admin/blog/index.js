@@ -94,7 +94,7 @@ export default function BlogDashboard() {
           render: (_, record) => {
             return (
               <Link
-                to={`/admin/blog/${record?.blog_id}`}
+                to={`/admin/blog/${record?.blog_slug}`}
                 className={"text-[var(--blue)]"}
               >
                 <EditOutlined />

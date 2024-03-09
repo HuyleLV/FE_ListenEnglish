@@ -18,7 +18,7 @@ export default function BlogDetail() {
 
     const getNews = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getById/${params?.blog_id}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getBySlug/${params?.slug}`);
           setdataNews(response?.data[0]);
         } catch (error) {
           console.error(error);
@@ -33,7 +33,7 @@ export default function BlogDetail() {
         <div class="max-w-screen-xl items-center mx-auto py-1">
             <Row>
                 <Col span={24}>
-                    
+
                     <div className='p-10 py-10 mt-4 bg-white drop-shadow'>
                         <p className='text-4xl font-bold'>{news?.blog_title}</p>
                         <div className='flex justify-center py-10'>
@@ -41,7 +41,7 @@ export default function BlogDetail() {
                         </div>
                         <p className='font-semibold pb-3 text-slate-600'>{parse(String(news?.blog_description).replaceAll(/<h1|<h2|<h3|ul>/gi, matched => mapObj[matched]))}</p>
                     </div>
-                    
+
                 </Col>
             </Row>
 

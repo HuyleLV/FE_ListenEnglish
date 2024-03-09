@@ -46,8 +46,8 @@ export default function Blog() {
                                     :
                                         <p className='font-semibold py-5 text-slate-600 h-16 text-ellipsis overflow-hidden'>{parse(String(item?.blog_description))}</p>
                                     }
-                                    
-                                    <a href={"/blog/" + item?.blog_id}>
+
+                                    <a href={"/blog/" + item?.blog_slug}>
                                         <button className='bg-[#2ca1db] px-5 py-2 mt-5 text-white font-bold'>
                                             Continue Reading
                                         </button>
@@ -55,7 +55,7 @@ export default function Blog() {
                                 </div>
                             )}
                         />
-                        
+
                         <Pagination
                             className="flex justify-center"
                             current={pagination.page}

@@ -52,9 +52,9 @@ export default function UsersDashboard() {
       .post(`${process.env.REACT_APP_API_URL}/admin/update/${id}`, {role: value})
       .finally(() => {
         fetchUser();
-        message.success("Cập nhập thành công!");
+        message.success("Cập nhật thành công!");
       });
-    
+
   };
 
   const optionRole = [

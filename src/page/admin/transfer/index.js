@@ -13,7 +13,7 @@ export default function TransferDetail() {
     page: 1,
     pageSize: 5,
   });
-  
+
   const fetchTransfer = async () => {
     await axios
       .get(`${process.env.REACT_APP_API_URL}/transfer/getAll`, {params: pagination})
@@ -52,16 +52,16 @@ export default function TransferDetail() {
       })
       .finally(() => {
         fetchTransfer();
-        message.success("Cập nhập thành công!");
+        message.success("Cập nhật thành công!");
       });
-    
+
   };
 
   const optionTransfer = [
     { value: "1", label: "Chờ Xác nhận" },
     { value: "2", label: "Xác nhận" },
   ];
-  
+
   useEffect(() => {
     fetchTransfer();
   }, [pagination]);
@@ -120,7 +120,7 @@ export default function TransferDetail() {
       dataIndex: "vip_expire_at",
       width: 160,
       render: (_, record) => (
-        <div>            
+        <div>
             {dayjs(record?.vip_expire_at).format("DD/MM/YYYY")}
         </div>
       ),
@@ -166,7 +166,7 @@ export default function TransferDetail() {
         );
       },
     }
-    
+
   ];
 
   return (
@@ -185,8 +185,8 @@ export default function TransferDetail() {
           columns={columns}
           pagination={false}
         />
-      
-        <Pagination 
+
+        <Pagination
           className="flex justify-center absolute inset-x-0 bottom-24"
           current={pagination.page}
           total={transfer?.total}

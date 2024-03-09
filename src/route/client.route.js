@@ -21,11 +21,11 @@ export const Client = () => {
         <Route path="/ranking/streak" element={<RankingStreak />} />
         <Route path="/ranking/timer" element={<RankingTimer/>} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:blog_id" element={<BlogDetail />} />
+        <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/playlist" element={<Playlist />} />
-        <Route path="/lesson/:topic_id" element={<Lesson />} />
-        <Route path="/lesson/detail/:lesson_id" element={<LessonDetail />} />
-        <Route path="/lesson/speaking/:lesson_id" element={<Speaking />} />
+        <Route path="/lesson/:slug" element={<Lesson />} />
+        <Route path="/lesson/detail/:slug" element={<LessonDetail />} />
+        <Route path="/lesson/speaking/:slug" element={<Speaking />} />
         <Route path="/profile/:user_id" element={<Profile />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/login" element={<Login/>} />

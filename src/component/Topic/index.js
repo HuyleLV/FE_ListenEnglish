@@ -13,7 +13,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-  
+import CustomUpload from "../customUpload";
+import slugify from "slugify";
+
   export default function TopicForm({
     id = "",
     initialValues = {},
@@ -24,19 +26,23 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 
     const deleteTopic = async () => {
       await axios
-        .delete(`${process.env.REACT_APP_API_URL}/topic/delete/${id}`)
+        .delete(`${process.env.REACT_APP_API_URL}/topic/deleteBySlug/${initialValues?.slug}`)
         .then(() => {
           message.success("Xoá bài viết thành công");
           navigate("/admin/topic");
         })
     };
-  
+
+    const handleTopicSlugChange = (e) => {
+        form.setFieldValue('slug', slugify(e.target.value, {lower: true}));
+    };
+
     useEffect(() => {
       if (Object.keys(initialValues)?.length > 0) {
         form.resetFields();
       }
     }, [form, initialValues]);
-  
+
     const confirmDeleteBusiness = () => {
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
@@ -46,6 +52,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
         onOk: () => deleteTopic(),
       });
     };
+
     return (
       <div className={"p-[40px] bg-white rounded-[10px]"}>
         <div className={"!text-[#2d2e32] pb-[10px]"}>
@@ -58,7 +65,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
             {"Thông tin Topic"}
           </Link>
         </div>
-  
+
         <Form
           layout={"vertical"}
           colon={false}
@@ -68,17 +75,32 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
           onFinish={onSubmit}
         >
           <Form.Item
-            label={"Tiều đề"}
+            label={"Tiêu đề"}
             name="title"
             rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
           >
-            <Input size="large" placeholder={"Nhập"} />
+            <Input size="large" placeholder={"Nhập"} onChange={handleTopicSlugChange}/>
           </Form.Item>
-  
+            <Form.Item
+                label={"Slug"}
+                name="slug"
+                rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+            >
+                <Input size="large" placeholder={"Nhập"} onBlur={handleTopicSlugChange}/>
+            </Form.Item>
+
+            <Form.Item
+                label={"Ảnh topic"}
+                name="image_url"
+                rules={[{ required: true, message: "Vui lòng chọn ảnh!" }]}
+            >
+                <CustomUpload type="image" accept=".png, .jpg, .jpeg, .jfif" />
+            </Form.Item>
+
           <Row gutter={40} className={"my-[40px] pl-[20px]"}>
             <Space align="center">
               <Button type={"primary"} htmlType={"submit"}>
-                {id ? "Cập nhập" : "Tạo"}
+                {id ? "Cập nhật" : "Tạo"}
               </Button>
               {id && (
                 <Button type={"primary"} danger onClick={confirmDeleteBusiness}>
@@ -91,4 +113,3 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
       </div>
     );
   }
-  

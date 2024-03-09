@@ -18,7 +18,8 @@ import CustomUpload from "../customUpload";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import TextArea from "antd/es/input/TextArea";
-  
+import slugify from "slugify";
+
 export default function LessonForm({
     id = "",
     initialValues = {},
@@ -51,14 +52,18 @@ export default function LessonForm({
           navigate("/admin/lesson");
         })
     };
-  
+
+    const handleLessonSlugChange = (e) => {
+        form.setFieldValue('slug', slugify(e.target.value, {lower: true}));
+    };
+
     useEffect(() => {
         fetchTopic();
         if (Object.keys(initialValues)?.length > 0) {
             form.resetFields();
         }
     }, [form, initialValues]);
-  
+
     const confirmDeleteBusiness = () => {
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
@@ -80,7 +85,7 @@ export default function LessonForm({
             {"Thông tin Lesson"}
           </Link>
         </div>
-  
+
         <Form
           layout={"vertical"}
           colon={false}
@@ -90,13 +95,19 @@ export default function LessonForm({
           onFinish={onSubmit}
         >
             <Form.Item
-                label={"Tiều đề"}
+                label={"Tiêu đề"}
                 name="title"
                 rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
             >
-                <Input size="large" placeholder={"Nhập"} />
+                <Input size="large" placeholder={"Nhập"} onChange={handleLessonSlugChange}/>
             </Form.Item>
-        
+            <Form.Item
+                label={"Slug"}
+                name="slug"
+                rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+            >
+                <Input size="large" placeholder={"Nhập"} onBlur={handleLessonSlugChange}/>
+            </Form.Item>
             <Row className="flex justify-center">
                 <Col span={4} className="mr-4">
                     <Form.Item
@@ -222,11 +233,11 @@ export default function LessonForm({
                     </Form.Item>
                 </Col>
             </Row>
-    
+
             <Row gutter={40} className={"my-[40px] pl-[20px]"}>
                 <Space align="center">
                 <Button type={"primary"} htmlType={"submit"}>
-                    {id ? "Cập nhập" : "Tạo"}
+                    {id ? "Cập nhật" : "Tạo"}
                 </Button>
                 {id && (
                     <Button type={"primary"} danger onClick={confirmDeleteBusiness}>
@@ -239,4 +250,3 @@ export default function LessonForm({
       </div>
     );
   }
-  

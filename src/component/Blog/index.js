@@ -16,7 +16,8 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import CustomUpload from "../customUpload";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-  
+import slugify from "slugify";
+
   export default function BlogForm({
     id = "",
     initialValues = {},
@@ -37,7 +38,7 @@ import 'react-quill/dist/quill.snow.css';
         [{ background: ["red", "#785412"] }]
       ]
     };
-  
+
     const formats = [
       "header",
       "bold",
@@ -58,19 +59,23 @@ import 'react-quill/dist/quill.snow.css';
 
     const deleteBlog = async () => {
       await axios
-        .delete(`${process.env.REACT_APP_API_URL}/blog/delete/${id}`)
+        .delete(`${process.env.REACT_APP_API_URL}/blog/deleteBySlug/${initialValues?.blog_slug}`)
         .then(() => {
           message.success("Xoá bài viết thành công");
           navigate("/admin/blog");
         })
     };
-  
+
+    const handleBlogSlugChange = (e) => {
+      form.setFieldValue('blog_slug', slugify(e.target.value, {lower: true}));
+    };
+
     useEffect(() => {
       if (Object.keys(initialValues)?.length > 0) {
         form.resetFields();
       }
     }, [form, initialValues]);
-  
+
     const confirmDeleteBusiness = () => {
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
@@ -92,7 +97,7 @@ import 'react-quill/dist/quill.snow.css';
             {"Thông tin bài viết"}
           </Link>
         </div>
-  
+
         <Form
           layout={"vertical"}
           colon={false}
@@ -102,11 +107,11 @@ import 'react-quill/dist/quill.snow.css';
           onFinish={onSubmit}
         >
           <Form.Item
-            label={"Tiều đề"}
+            label={"Tiêu đề"}
             name="blog_title"
             rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
           >
-            <Input size="large" placeholder={"Nhập"} />
+            <Input size="large" placeholder={"Nhập"} onChange={handleBlogSlugChange}/>
           </Form.Item>
 
           <Form.Item
@@ -114,7 +119,7 @@ import 'react-quill/dist/quill.snow.css';
             name="blog_slug"
             rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
           >
-            <Input size="large" placeholder={"Nhập"} />
+            <Input size="large" placeholder={"Nhập"} onBlur={handleBlogSlugChange}/>
           </Form.Item>
 
           <Form.Item
@@ -132,11 +137,11 @@ import 'react-quill/dist/quill.snow.css';
           >
             <CustomUpload type="image" accept=".png, .jpg, .jpeg, .jfif" />
           </Form.Item>
-  
+
           <Row gutter={40} className={"my-[40px] pl-[20px]"}>
             <Space align="center">
               <Button type={"primary"} htmlType={"submit"}>
-                {id ? "Cập nhập" : "Tạo"}
+                {id ? "Cập nhật" : "Tạo"}
               </Button>
               {id && (
                 <Button type={"primary"} danger onClick={confirmDeleteBusiness}>
@@ -149,4 +154,3 @@ import 'react-quill/dist/quill.snow.css';
       </div>
     );
   }
-  

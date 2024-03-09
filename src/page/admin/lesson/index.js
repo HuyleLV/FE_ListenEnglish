@@ -51,6 +51,13 @@ export default function LessonDashboard() {
           render: (_, record) => <div>{record?.title}</div>,
         },
         {
+            title: <div className={"base-table-cell-label"}>Slug</div>,
+            key: "slug",
+            dataIndex: "slug",
+            width: 200,
+            render: (_, record) => <div>{record?.slug}</div>,
+        },
+        {
           title: <div className={"base-table-cell-label"}>Topic</div>,
           key: "topic_title",
           dataIndex: "topic_title",
@@ -87,7 +94,7 @@ export default function LessonDashboard() {
           render: (_, record) => {
             return (
               <Link
-                to={`/admin/lesson/${record?.id}`}
+                to={`/admin/lesson/${record?.slug}`}
                 className={"text-[var(--blue)]"}
               >
                 <EditOutlined />

@@ -10,12 +10,12 @@ export default function LessonDetail() {
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({});
   const params = useParams();
-  const id = params?.lesson_id;
+  const slug = params?.slug;
   const [cookies, setCookie, removeCookie] = useCookies(['admin']);
 
   const fetchLesson = async () => {
     await axios
-      .get(`${process.env.REACT_APP_API_URL}/lesson/getById/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/lesson/getBySlug/${slug}`)
       .then((res) => {
         const data = res?.data[0];
         const values = {
@@ -40,23 +40,23 @@ export default function LessonDetail() {
   };
 
   useEffect(() => {
-    if (id && id !== "create") {
+    if (slug && slug !== "create") {
         fetchLesson();
     }
-  }, [id]);
+  }, [slug]);
 
   const onSubmit = async (values) => {
     const submitValues = {
       ...values,
       create_by: cookies.admin[0]?.id
     };
-    
+
     console.log(submitValues);
 
     try {
-      if (id && id !== "create") {
-        await updateLesson(id, submitValues);
-        message.success("Cập nhập thành công");
+      if (slug && slug !== "create") {
+        await updateLesson(initialValues?.id, submitValues);
+        message.success("Cập nhật thành công");
       } else {
         await createLesson(submitValues);
         message.success("Tạo mới thành công");
@@ -64,17 +64,18 @@ export default function LessonDetail() {
       navigate("/admin/lesson");
     } catch (error) {
       console.log(error);
+      message.success("Slug đã được sử dụng");
     }
   };
 
   useEffect(() => {
-    if (id) fetchLesson();
+    if (slug) fetchLesson();
         form.resetFields();
-  }, [form, id]);
+  }, [form, slug]);
 
   return (
     <LessonForm
-      id={id !== "create" ? id : undefined}
+      id={slug !== "create" ? initialValues?.id : undefined}
       initialValues={initialValues}
       onSubmit={onSubmit}
     />

@@ -16,7 +16,7 @@ import { Segmented } from 'antd';
 
 export default function LessonDetail() {
 
-    const { lesson_id } = useParams();
+    const { slug } = useParams();
     const { isMobile } = useDevice();
     const [story, setStory] = useState("Main Story");
     const navigate = useNavigate();
@@ -24,7 +24,11 @@ export default function LessonDetail() {
     const [currentTime, setcurrentTime] = useState(0);
     const [songs, setSongs] = useState(songsdata);
     const [currentSong, setCurrentSong] = useState(songsdata[1]);
-    const audioElem = useRef();    const [news, setdataNews] = useState([]);
+    const [repeatMode, setRepeatMode] = useState('off');
+    const [speedMode, setSpeedMode] = useState(1);
+    const [soundMode, setSoundMode] = useState(1);
+    const audioElem = useRef();
+    const [news, setdataNews] = useState([]);
     const [dataLesson, setdataLesson] = useState([]);
     const [pagination, setPagination] = useState({
         page: 1,
@@ -38,7 +42,7 @@ export default function LessonDetail() {
         reset,
         play,
         pause
-    } = useTimer(4);
+    } = useTimer(200);
 
     const {
         signal,
@@ -64,32 +68,83 @@ export default function LessonDetail() {
 
     const lesson = async () => {
         try {
-            await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getById/` + lesson_id)
+            await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlug/` + slug)
                 .then(response => setdataLesson(response.data[0]));
         } catch (error) {
           console.error(error);
         }
     }
 
-    useEffect(() => {
-        if (isPlaying) {
-            audioElem.current.play();
-        } else {
-            audioElem.current.pause();
+    const changeRepeatMode = async () => {
+        if (repeatMode === 'off') {
+            setRepeatMode('track');
         }
-    }, [isPlaying, dataLesson])
+        if (repeatMode === 'track') {
+            setRepeatMode('one');
+        }
+        if (repeatMode === 'one') {
+            setRepeatMode('off');
+        }
+    };
+
+    const changeSpeedMode = () => {
+        const playbackRate = audioElem.current?.playbackRate;
+        if (speedMode !== 2 && playbackRate !== undefined) {
+            if (playbackRate === 0.5) {
+                setSpeedMode(speedMode+0.5);
+                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.5;
+            } else {
+                setSpeedMode(speedMode+0.25);
+                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.25;
+            }
+        } else if (playbackRate !== undefined) {
+            setSpeedMode(0.5);
+            audioElem.current.playbackRate = 0.5;
+        }
+    };
+
+    const changeSoundMode = async () => {
+        if (soundMode === 1) {
+            setSoundMode(0);
+            audioElem.current.volume = 0;
+        } else if (soundMode === 0) {
+            setSoundMode(0.25);
+            audioElem.current.volume = 0.25;
+        } else if (soundMode === 0.25) {
+            setSoundMode(0.5);
+            audioElem.current.volume = 0.5;
+        } else if (soundMode === 0.5) {
+            setSoundMode(1);
+            audioElem.current.volume = 1;
+        }
+    };
+
+    // useEffect(() => {
+    //     if (isPlaying) {
+    //         audioElem.current.play();
+    //     } else {
+    //         audioElem.current.pause();
+    //     }
+    // }, [isPlaying, dataLesson])
 
     useEffect(() => {
         lesson();
         getNews();
-    }, [])
+    }, []);
 
     useEffect(() => {
-        if(dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD") && cookies?.user?.vip_expire_at !== null){
-
-        } else {
-            navigate("/");
+        if (isPlaying) {
+            audioElem.current.play();
+            // setisPlaying(true);
         }
+    }, [story])
+
+    useEffect(() => {
+        // if(dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD") && cookies?.user?.vip_expire_at !== null){
+        //
+        // } else {
+        //     navigate("/");
+        // }
     }, [cookies])
 
     return (
@@ -105,7 +160,7 @@ export default function LessonDetail() {
                             title: <a href="/topic">Topic</a>,
                         },
                         {
-                            title: <a href={"/lesson/" + dataLesson?.topic_id}>{dataLesson?.topic_title}</a>,
+                            title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_slug}</a>,
                         },
                         {
                             title: dataLesson?.title,
@@ -113,32 +168,37 @@ export default function LessonDetail() {
                     ]}
                 />
                 <p className="text-4xl font-semibold text-center pt-10">{dataLesson?.title}</p>
-                <Segmented 
-                    className="my-[20px]" 
-                    options={['Main Story', 'Vocabulary', 'Mini Story']} 
+                <Segmented
+                    className="my-[20px]"
+                    options={['Main Story', 'Vocabulary', 'Mini Story']}
                     value={story}
-                    onChange={(e)=>setStory(e)}
+                    onChange={(e)=> {
+                        setStory(e);
+                        setisPlaying(true);
+                    }}
                     block />
                 <div>
                     <audio
-                        src={story === "Main Story" 
-                        ? dataLesson?.mainStoryAudio 
-                        : story === "Vocabulary" 
+                        src={story === "Main Story"
+                        ? dataLesson?.mainStoryAudio
+                        : story === "Vocabulary"
                             ? dataLesson?.vocabularyAudio
-                            : story === "Mini Story" 
+                            : story === "Mini Story"
                                 ? dataLesson?.miniStoryAudio
                                 : null
                         }
                         ref={audioElem}
+                        loop={repeatMode === 'one'}
                         onTimeUpdate={onPlaying}
+                        // onEnded={handleChangeStory}
                     />
                     {dataLesson?.mainStory && story === "Main Story"  ?
                         <>
                             <Lrc
-                                className="bg-red-100 p-10"
+                                className="bg-red-100 p-10 h-screen"
                                 lineRenderer={({ active, line: { content } }) =>
                                     (
-                                        active ? 
+                                        active ?
                                             <>
                                                 <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
                                             </>
@@ -147,19 +207,19 @@ export default function LessonDetail() {
 
                                 }
                                 currentMillisecond={currentTime}
-                                verticalSpace
+                                // verticalSpace
                                 recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={20000}
+                                recoverAutoScrollInterval={5000}
                                 lrc={dataLesson?.mainStory}
                             />
                         </>
                         : story === "Vocabulary" ?
                         <>
                             <Lrc
-                                className="bg-red-100 p-10"
+                                className="bg-red-100 p-10 h-screen"
                                 lineRenderer={({ active, line: { content } }) =>
                                     (
-                                        active ? 
+                                        active ?
                                             <>
                                                 <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
                                             </>
@@ -168,7 +228,7 @@ export default function LessonDetail() {
 
                                 }
                                 currentMillisecond={currentTime}
-                                verticalSpace
+                                // verticalSpace
                                 recoverAutoScrollSingal={signal}
                                 recoverAutoScrollInterval={5000}
                                 lrc={dataLesson?.vocabulary}
@@ -177,10 +237,10 @@ export default function LessonDetail() {
                         : dataLesson?.miniStory && story === "Mini Story" ?
                         <>
                             <Lrc
-                                className="bg-red-100 p-10"
+                                className="bg-red-100 p-10 h-screen"
                                 lineRenderer={({ active, line: { content } }) =>
                                     (
-                                        active ? 
+                                        active ?
                                             <>
                                                 <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
                                             </>
@@ -189,7 +249,7 @@ export default function LessonDetail() {
 
                                 }
                                 currentMillisecond={currentTime}
-                                verticalSpace
+                                // verticalSpace
                                 recoverAutoScrollSingal={signal}
                                 recoverAutoScrollInterval={5000}
                                 lrc={dataLesson?.miniStory}
@@ -197,29 +257,33 @@ export default function LessonDetail() {
                         </>
                         : <></>
                     }
-                    <Control 
+                    <Control
                         onPlay={play}
                         onPause={pause}
                         onReset={reset}
                         current={currentTime}
                         setCurrent={setcurrentTime}
+                        changeRepeatMode={changeRepeatMode}
                         recoverAutoScrollImmediately={recoverAutoScrollImmediately}
                         isPlaying={isPlaying}
                         setisPlaying={setisPlaying}
-                        songs={songs} 
+                        songs={songs}
                         setSongs={setSongs}
                         audioElem={audioElem}
-                        currentSong={currentSong} 
+                        currentSong={currentSong}
                         setCurrentSong={setCurrentSong}
+                        repeatMode={repeatMode}
+                        changeSpeedMode={changeSpeedMode}
+                        changeSoundMode={changeSoundMode}
                     />
                 </div>
                 <div className="py-10">
                     <p className="text-3xl font-semibold text-center py-10">Learning English Tutorials And Tips</p>
                     <div className="flex justify-center">
-                        {!isMobile ? 
+                        {!isMobile ?
                             <List
                                 grid={{
-                                    xs: 24, 
+                                    xs: 24,
                                     xl: 5
                                 }}
                                 dataSource={news?.data}
@@ -230,7 +294,7 @@ export default function LessonDetail() {
                                             <img src={item?.blog_image} className=' h-[300px] rounded'/>
                                         </div>
                                         <p className='font-semibold py-5 text-slate-600 h-20 truncate'>{parse(String(item?.blog_description))}</p>
-                                        <a href={"/blog/" + item?.blog_id} className="flex justify-center">
+                                        <a href={"/blog/" + item?.blog_slug} className="flex justify-center">
                                             <button className='bg-[#2ca1db] px-5 py-2 my-5 text-white font-bold'>
                                                 Continue Reading
                                             </button>

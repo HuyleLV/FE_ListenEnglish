@@ -13,11 +13,11 @@ export const Admin = () => {
     return (
       <Routes>
         <Route path="/admin/blog" element={<BlogDashboard />} />
-        <Route path="/admin/blog/:blog_id" element={<BlogDetail />} />
+        <Route path="/admin/blog/:slug" element={<BlogDetail />} />
         <Route path="/admin/lesson" element={<LessonDashboard />} />
-        <Route path="/admin/lesson/:lesson_id" element={<LessonDetail />} />
+        <Route path="/admin/lesson/:slug" element={<LessonDetail />} />
         <Route path="/admin/topic" element={<TopicDashboard />} />
-        <Route path="/admin/topic/:topic_id" element={<TopicDetail />} />
+        <Route path="/admin/topic/:slug" element={<TopicDetail />} />
         <Route path="/admin/transfer" element={<TransferDetail />} />
         <Route path="/admin/user" element={<UsersDashboard />} />
       </Routes>

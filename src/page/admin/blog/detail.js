@@ -10,12 +10,12 @@ export default function BlogDetail() {
   const [form] = Form.useForm();
   const [initialValues, setInitialValues] = useState({});
   const params = useParams();
-  const id = params?.blog_id;
+  const slug = params?.slug;
   const [cookies, setCookie, removeCookie] = useCookies(['admin']);
 
   const fetchBlog = async () => {
     await axios
-      .get(`${process.env.REACT_APP_API_URL}/blog/getById/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/blog/getBySlug/${slug}`)
       .then((res) => {
         const data = res?.data[0];
         const values = {
@@ -40,10 +40,10 @@ export default function BlogDetail() {
   };
 
   useEffect(() => {
-    if (id && id !== "create") {
+    if (slug && slug !== "create") {
         fetchBlog();
     }
-  }, [id]);
+  }, [slug]);
 
   const onSubmit = async (values) => {
     const submitValues = {
@@ -52,9 +52,9 @@ export default function BlogDetail() {
     };
 
     try {
-      if (id && id !== "create") {
-        await updateBlog(id, submitValues);
-        message.success("Cập nhập thành công");
+      if (slug && slug !== "create") {
+        await updateBlog(initialValues?.blog_id, submitValues);
+        message.success("Cập nhật thành công");
       } else {
         await createBlog(submitValues);
         message.success("Tạo mới thành công");
@@ -62,17 +62,19 @@ export default function BlogDetail() {
       navigate("/admin/blog");
     } catch (error) {
       console.log(error);
+      message.error("Slug đã được sử dụng");
+
     }
   };
 
   useEffect(() => {
-    if (id) fetchBlog();
+    if (slug) fetchBlog();
         form.resetFields();
-  }, [form, id]);
+  }, [form, slug]);
 
   return (
     <BlogForm
-      id={id !== "create" ? id : undefined}
+      id={slug && slug !== "create" ? initialValues?.blog_id : undefined}
       initialValues={initialValues}
       onSubmit={onSubmit}
     />
