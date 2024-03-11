@@ -160,7 +160,7 @@ export default function LessonDetail() {
                             title: <a href="/topic">Topic</a>,
                         },
                         {
-                            title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_slug}</a>,
+                            title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_title}</a>,
                         },
                         {
                             title: dataLesson?.title,
@@ -200,7 +200,7 @@ export default function LessonDetail() {
                                     (
                                         active ?
                                             <>
-                                                <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
                                             </>
                                             : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
                                     )
@@ -221,7 +221,7 @@ export default function LessonDetail() {
                                     (
                                         active ?
                                             <>
-                                                <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
                                             </>
                                             : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
                                     )
@@ -242,7 +242,7 @@ export default function LessonDetail() {
                                     (
                                         active ?
                                             <>
-                                                <p active={active} className="text-green-600 font-bold text-xl">{content}</p>
+                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
                                             </>
                                             : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
                                     )

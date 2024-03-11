@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import useTimer from "../component/UseTimer";
 import cd from "../component/icon/cd.png"
 import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
@@ -10,7 +10,20 @@ import {Breadcrumb, Segmented} from "antd";
 import { useCookies } from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import {AudioMutedOutlined, AudioOutlined} from "@ant-design/icons";
+import {AudioFilled, AudioMutedOutlined, AudioOutlined} from "@ant-design/icons";
+import formatSecondToTime from "../utils/formatSecondToTime";
+import repeatOff from "../component/icon/repeat-off.png";
+import repeatTrack from "../component/icon/repeat-track.png";
+import repeatOne from "../component/icon/repeat-one.png";
+import back from "../component/icon/back.png";
+import pause from "../component/icon/pause.png";
+import play from "../component/icon/play-button-arrowhead.png";
+import next from "../component/icon/next.png";
+import volumeHigh from "../component/icon/volume-high.png";
+import volumeLow from "../component/icon/volume-low.png";
+import volumeMedium from "../component/icon/volume-medium.png";
+import volumeMute from "../component/icon/volume-mute.png";
+import toCamelCase from "../utils/toCamelCase";
 
 export default function Speaking() {
 
@@ -18,10 +31,13 @@ export default function Speaking() {
     const navigate = useNavigate();
     const containerRef = useRef(null);
     const [dataLesson, setdataLesson] = useState([]);
+    const [records, setRecords] = useState([]);
+    const [recordMain, setRecordMain] = useState([]);
     const [arrayMain, setArrayMain] = useState([]);
     const [indexLyric, setIndexLyric] = useState(0);
     const [recordingIndex, setRecordingIndex] = useState(-1);
     const [story, setStory] = useState("Main Story");
+    const [recordingAll, setRecordingAll] = useState(false);
     const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
     const {
@@ -67,25 +83,52 @@ export default function Speaking() {
           console.error(error);
         }
     }
+    const getRecords = async () => {
+        try {
+            await axios.get(`${process.env.REACT_APP_API_URL}/user/record`, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${cookies?.user?.token}`,
+                },
+            })
+                .then(response => {
+                    setRecords(response.data);
+                });
+        } catch (error) {
+          console.error(error);
+        }
+    }
 
     useEffect(() => {
         const containerElement = containerRef.current;
         containerElement.scrollTop = containerElement.scrollHeight;
     }, [containerRef]);
 
-    useEffect(() => {
+    useEffect( () => {
         lesson();
-    }, [])
+        getRecords();
+    }, []);
 
     useEffect(() => {
         if(!listening) {
             setRecordingIndex(-1);
+            if (recordingAll && indexLyric < arrayMain.length - 1) {
+                if (transcript !== '') {
+                    setTimeout(() => clickMic(indexLyric+1).then(), [1000]);
+                } else {
+                    alert('Ban co muon tiep tuc khong')
+                }
+            }
         }
     }, [listening])
 
     useEffect(() => {
         convertString(story === "Main Story" ? dataLesson?.mainStory : story === "Vocabulary" ? dataLesson?.vocabulary : dataLesson?.miniStory);
-    }, [story, dataLesson])
+        setRecordMain(records.filter(
+            rec => +rec.lesson_id === +dataLesson.id && toCamelCase(rec.track) === story,
+        ))
+    }, [story, dataLesson, records])
 
     useEffect(() => {
         postTrans(transcript);
@@ -131,12 +174,15 @@ export default function Speaking() {
                             {arrayMain.map((e,i) => (
                                 <div className="border-b border-black p-4 w-full">
                                     <button className="w-full" onClick={() => setIndexLyric(i)}>
-                                        <div className="flex justify-between">
-                                            {indexLyric === i ? <p className="font-bold text-xl text-orange-500">{e}</p> : <p className="font-bold text-xl">{e}</p>}
+                                        <div className="flex flex-row justify-between">
+                                            <div className="flex flex-row">
+                                                {e.split(' ').map(el => (indexLyric === i ? <p className="font-bold text-xl text-orange-500">{el}&nbsp;</p> : <p className="font-bold text-xl">{el}&nbsp;</p>))}
+                                            </div>
                                             <button disabled={recordingIndex > -1 && recordingIndex !== i} onClick={()=>clickMic(i)}>{recordingIndex > -1 && recordingIndex !== i ? <AudioMutedOutlined /> : <AudioOutlined style={{ color: recordingIndex === i ? 'red' : null}} />}</button>
                                         </div>
                                         {i === indexLyric && (
-                                            <p className="w-full text-green-600 font-bold text-xl text-left">{transcript}</p>
+                                            <p className="w-full text-green-600 font-bold text-xl text-left">{recordMain.find(rec => +rec.position === i)?.text}</p>
+                                            // <p className="w-full text-green-600 font-bold text-xl text-left">{transcript}</p>
                                         )}
                                     </button>
                                 </div>
@@ -144,39 +190,29 @@ export default function Speaking() {
                         {/* <button onClick={SpeechRecognition.stopListening}>Stop</button>
                         <button onClick={resetTranscript}>Reset</button> */}
                     </div>
-                {/*) : dataLesson?.vocabulary && story === "Vocabulary" ? (*/}
-                {/*    <div className="bg-red-100 h-screen overflow-y-scroll" ref={containerRef}>*/}
-                {/*        {arrayMain.map((e,i) => (*/}
-                {/*            <div className="border-b border-black p-4">*/}
-                {/*                <div className="flex justify-between">*/}
-                {/*                    <p className="font-bold text-xl">{e}</p>*/}
-                {/*                    <button onClick={()=>clickMic(i)}><AudioOutlined /></button>*/}
-                {/*                </div>*/}
-                {/*                {i === indexLyric && (*/}
-                {/*                    <p className="text-green-600 font-bold text-xl">{transcript}</p>*/}
-                {/*                )}*/}
-                {/*            </div>*/}
-                {/*        ))}*/}
-                {/*        /!* <button onClick={SpeechRecognition.stopListening}>Stop</button>*/}
-                {/*        <button onClick={resetTranscript}>Reset</button> *!/*/}
-                {/*    </div>*/}
-                {/*) : (*/}
-                {/*    <div className="bg-red-100 h-screen overflow-y-scroll">*/}
-                {/*        {arrayMain.map((e,i) => (*/}
-                {/*            <div className="border-b border-black p-4">*/}
-                {/*                <div className="flex justify-between">*/}
-                {/*                    <p className="font-bold text-xl">{e}</p>*/}
-                {/*                    <button onClick={()=>clickMic(i)}><AudioOutlined /></button>*/}
-                {/*                </div>*/}
-                {/*                {i === indexLyric && (*/}
-                {/*                    <p className="text-green-600 font-bold text-xl">{transcript}</p>*/}
-                {/*                )}*/}
-                {/*            </div>*/}
-                {/*        ))}*/}
-                {/*        /!* <button onClick={SpeechRecognition.stopListening}>Stop</button>*/}
-                {/*        <button onClick={resetTranscript}>Reset</button> *!/*/}
-                {/*    </div>*/}
-                {/*)}*/}
+                <div>
+                    <center>
+                        <div className='p-4 bg-gradient-to-r from-red-500 to-red-800 flex flex-row justify-center'>
+                            <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={() => indexLyric > 0 && setIndexLyric( indexLyric-1)}>
+                                <img src={back} className='w-10 h-10'/>
+                            </button>
+                                <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={() => {
+                                    if (!listening) {
+                                        setRecordingAll(true);
+                                        clickMic(indexLyric).then();
+                                    } else {
+                                        setRecordingAll(false);
+                                        SpeechRecognition.stopListening().then();
+                                    }
+                                }}>
+                                    <AudioFilled style={{ color: listening ? 'red' : null, fontSize: 30}} className='w-10 h-10 justify-center text-white'/>
+                                </button>
+                            <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={() => indexLyric < arrayMain.length-1 && setIndexLyric(indexLyric+1)}>
+                                <img src={next} className='w-10 h-10'/>
+                            </button>
+                        </div>
+                    </center>
+                </div>
         </div>
     );
 };
