@@ -29,9 +29,12 @@ function Control({
   setSongs,
   audioElem,
   currentSong,
-  setCurrentSong, repeatMode,
-                   changeSpeedMode,
-    changeSoundMode
+  setCurrentSong,
+  repeatMode,
+  changeSpeedMode,
+  changeSoundMode,
+  isPlaylist,
+  openModal
 }) {
   const clickRef = useRef();
   const { lesson_id } = useParams();
@@ -40,14 +43,18 @@ function Control({
 
 
   const PlayPause = () => {
-    if (isPlaying === true){
-      audioElem.current.pause();
-      onPause();
-    }else {
-      audioElem.current.play();
-      onPlay();
+    try {
+      if (isPlaying === true){
+        audioElem.current.pause();
+        onPause();
+      }else {
+        audioElem.current.play();
+        onPlay();
+      }
+      setisPlaying(!isPlaying);
+    } catch (e) {
+      console.log(e)
     }
-    setisPlaying(!isPlaying);
   }
   const skipForward = (time) => {
     if (time === 'forward' && audioElem.current?.currentTime){
@@ -67,11 +74,15 @@ function Control({
 
   const checkWidth = (e)=>
   {
-    let width = clickRef.current.clientWidth;
-    const offset = e.nativeEvent.offsetX;
+    try {
+      let width = clickRef.current.clientWidth;
+      const offset = e.nativeEvent.offsetX;
 
-    const divprogress = offset / width * 100;
-    audioElem.current.currentTime = divprogress / 100 * currentSong.length;
+      const divprogress = offset / width * 100;
+      audioElem.current.currentTime = divprogress / 100 * currentSong.length;
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   return (
@@ -109,9 +120,9 @@ function Control({
           <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={changeSoundMode}>
             <img src={audioElem.current?.volume === 1 ? volumeHigh : audioElem.current?.volume === 0.25 ? volumeLow : audioElem.current?.volume === 0.5 ? volumeMedium : volumeMute} className='w-10 h-10'/>
           </button>
-          <button type="button" className='mx-5 rounded-full p-4 bg-orange-600'>
+          {!isPlaylist && <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={openModal}>
             <BarsOutlined className='w-10 h-10 flex justify-center text-white text-4xl font-bold'/>
-          </button>
+          </button>}
         </div>
       </center>
     </>

@@ -12,6 +12,8 @@ import RankingStreak from "../page/RankingStreak";
 import RankingTimer from "../page/RankingTimer";
 import Speaking from "../page/Speaking";
 import Playlist from "../page/Playlist";
+import LessonPlaylist from "../page/LessonPlaylist";
+import PlaylistDetail from "../page/PlaylistDetail";
 
 export const Client = () => {
     return (
@@ -23,6 +25,8 @@ export const Client = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/playlist" element={<Playlist />} />
+        <Route path="/playlist/:id" element={<LessonPlaylist />} />
+        <Route path="/playlist/detail/:id" element={<PlaylistDetail />} />
         <Route path="/lesson/:slug" element={<Lesson />} />
         <Route path="/lesson/detail/:slug" element={<LessonDetail />} />
         <Route path="/lesson/speaking/:slug" element={<Speaking />} />

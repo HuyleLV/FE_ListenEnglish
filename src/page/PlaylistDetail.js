@@ -1,32 +1,26 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useTimer from "../component/UseTimer";
 import cd from "../component/icon/cd.png"
 import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
 import Control from "../component/Control";
 import { songsdata } from "../component/audio";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Footer from "../component/Footer";
-import {Breadcrumb, Col, List, message, Modal, Row, Select} from "antd";
+import { Breadcrumb, Col, List, Row } from "antd";
 import parse from "html-react-parser";
 import { useDevice } from "../hooks/useDevice";
 import { useCookies } from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
 import { Segmented } from 'antd';
 import toCamelCase from "../utils/toCamelCase";
-import toLowerCamelCase from "../utils/toLowerCamelCase";
 
-export default function LessonDetail() {
+export default function PlaylistDetail() {
 
-    const { slug } = useParams();
+    const { id } = useParams();
     const { isMobile } = useDevice();
-    const location = useLocation();
-    const index = location?.state;
-
-    const [story, setStory] = useState("Main Story");
-    const [dataPlaylist, setdataPlaylist] = useState([]);
-    const [selectedPlaylist, setPlaylist] = useState([]);
-    const [options, setOptions] = useState([]);
+    const [story, setStory] = useState(0);
+    const [segment, setSegment] = useState("");
     const navigate = useNavigate();
     const [isPlaying, setisPlaying] = useState(false);
     const [currentTime, setcurrentTime] = useState(0);
@@ -37,9 +31,8 @@ export default function LessonDetail() {
     const [soundMode, setSoundMode] = useState(1);
     const audioElem = useRef();
     const [news, setdataNews] = useState([]);
-    const [dataLesson, setdataLesson] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [dataUserTopic, setDataUserTopic] = useState({});
+    const [options, setOptions] = useState([]);
+    const [dataLessonPlaylist, setdataLessonPlaylist] = useState([]);
 
     const [pagination, setPagination] = useState({
         page: 1,
@@ -77,43 +70,16 @@ export default function LessonDetail() {
         }
     }
 
-    const lesson = async () => {
+    const lessonPlaylist = async () => {
         try {
-            await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlug/` + slug)
-                .then(response => setdataLesson(response.data[0]));
-        } catch (error) {
-          console.error(error);
-        }
-    }
-
-    const playlist = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/playlist`, {params: {
-            page: 1,
-            pageSize: 12,
-          }, headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookies?.user?.token}`
-                }});
-            const playlists = []
-            response?.data.data.forEach(el => playlists.push({value: el.id, label: el.title}))
-            setdataPlaylist(playlists);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const userTopic = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/usertopic`, {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookies?.user?.token}`
-                }
-            });
-            setDataUserTopic(response?.data[0]);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/lessonplaylist/playlist/${id}`,
+                {params: pagination, headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${cookies?.user?.token}`
+                    }});
+            setdataLessonPlaylist(response?.data.data);
+            console.log(response?.data.data)
         } catch (error) {
             console.error(error);
         }
@@ -165,33 +131,9 @@ export default function LessonDetail() {
 
     const handleEnded = () => {
         if(repeatMode === 'track') {
-            setStory(options[options.indexOf(story)+1]);
+            setSegment(options[story+1]);
+            setStory(story+1);
         };
-    }
-
-    const openModal = () => {
-        setIsModalOpen(true)
-    }
-
-    const addToPlaylist = async () => {
-        await axios
-            .post(`${process.env.REACT_APP_API_URL}/lessonplaylist`, {
-                playlist_id: selectedPlaylist,
-                lesson_id: dataLesson?.id,
-                track: toLowerCamelCase(story),
-            }, {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookies?.user?.token}`
-                }
-                })
-            .then(() => {
-                message.success("Thêm vào playlist thành công!");
-            }).catch(e => {
-                console.log(e);
-                message.success("Thêm vào playlist thành công!");
-            })
     }
 
     // useEffect(() => {
@@ -200,49 +142,27 @@ export default function LessonDetail() {
     //     } else {
     //         audioElem.current.pause();
     //     }
-    // }, [isPlaying, dataLesson])
+    // }, [isPlaying, dataLessonPlaylist])
 
     useEffect(() => {
-        lesson();
+        lessonPlaylist();
         getNews();
-        playlist();
-        userTopic();
     }, []);
 
     useEffect(() => {
-        if (isPlaying) {
-            try {
-                audioElem.current.play();
-            }catch (e) {
-                console.log(e)
-            }
-            // setisPlaying(true);
-        }
-    }, [story])
+        const option = [];
+        dataLessonPlaylist.forEach(el => option.push(el.title + ' - ' + toCamelCase( el.track)))
+        setOptions(option);
+        setSegment(option[0] || "")
+    }, [dataLessonPlaylist]);
 
-    useEffect(() => {
-        const options = [];
-        if (dataLesson?.mainStory) options.push('Main Story');
-        if (dataLesson?.vocabulary) options.push('Vocabulary');
-        if (dataLesson?.miniStory) options.push('Mini Story');
-        if (dataLesson?.POV) options.push('POV');
-        if (dataLesson?.comment) options.push('Comment');
-        setOptions(options);
-    }, [dataLesson])
+    // useEffect(() => {
+    //     if (isPlaying) {
+    //         audioElem.current.play();
+    //         // setisPlaying(true);
+    //     }
+    // }, [story])
 
-    useEffect(() => {
-        console.log(dataUserTopic)
-        if (dataUserTopic?.lesson_id) {
-            if(dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
-                && cookies?.user?.vip_expire_at !== null
-                || +dataUserTopic?.lesson_id >= +dataLesson.id || +index === 0){
-
-            } else {
-                navigate("/");
-            }
-        }
-        if (!index) navigate("/");
-    }, [cookies, dataUserTopic])
 
     return (
         <>
@@ -254,43 +174,32 @@ export default function LessonDetail() {
                             title: <a href="/">Home</a>,
                         },
                         {
-                            title: <a href="/topic">Topic</a>,
+                            title: <a href="/playlist">Playlist</a>,
                         },
                         {
-                            title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_title}</a>,
-                        },
-                        {
-                            title: dataLesson?.title,
+                            title: <a href={"/playlist/" + id}>{id}</a>,
                         },
                     ]}
                 />
-                <p className="text-4xl font-semibold text-center pt-10">{dataLesson?.title}</p>
                 <Segmented
                     className="my-[20px]"
                     options={options}
-                    value={story}
+                    value={segment}
                     onChange={(e)=> {
-                        setStory(e);
+                        setStory(options.indexOf(e));
+                        setSegment(e);
                         setisPlaying(false);
                     }}
                     block />
                 <div>
                     <audio
-                        src={story === "Main Story"
-                        ? dataLesson?.mainStoryAudio
-                        : story === "Vocabulary"
-                            ? dataLesson?.vocabularyAudio
-                            : story === "Mini Story"
-                                ? dataLesson?.miniStoryAudio
-                                : null
-                        }
+                        src={dataLessonPlaylist[story]?.audio}
                         ref={audioElem}
                         loop={repeatMode === 'one'}
                         onTimeUpdate={onPlaying}
                         onEnded={handleEnded}
                     />
-                    {dataLesson?.mainStory && story === "Main Story"  ?
-                        <>
+                    { dataLessonPlaylist[story]?.text &&
                             <Lrc
                                 className="bg-red-100 p-10 h-screen"
                                 lineRenderer={({ active, line: { content } }) =>
@@ -307,52 +216,8 @@ export default function LessonDetail() {
                                 // verticalSpace
                                 recoverAutoScrollSingal={signal}
                                 recoverAutoScrollInterval={5000}
-                                lrc={dataLesson?.mainStory}
+                                lrc={dataLessonPlaylist[story]?.text}
                             />
-                        </>
-                        : story === "Vocabulary" ?
-                        <>
-                            <Lrc
-                                className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
-                                    (
-                                        active ?
-                                            <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
-                                            </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
-                                    )
-
-                                }
-                                currentMillisecond={currentTime}
-                                // verticalSpace
-                                recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
-                                lrc={dataLesson?.vocabulary}
-                            />
-                        </>
-                        : dataLesson?.miniStory && story === "Mini Story" ?
-                        <>
-                            <Lrc
-                                className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
-                                    (
-                                        active ?
-                                            <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
-                                            </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
-                                    )
-
-                                }
-                                currentMillisecond={currentTime}
-                                // verticalSpace
-                                recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
-                                lrc={dataLesson?.miniStory}
-                            />
-                        </>
-                        : <></>
                     }
                     <Control
                         onPlay={play}
@@ -372,8 +237,7 @@ export default function LessonDetail() {
                         repeatMode={repeatMode}
                         changeSpeedMode={changeSpeedMode}
                         changeSoundMode={changeSoundMode}
-                        isPlaylist={false}
-                        openModal={openModal}
+                        isPlaylist={true}
                     />
                 </div>
                 <div className="py-10">
@@ -423,28 +287,6 @@ export default function LessonDetail() {
                     </div>
                 </div>
             </div>
-            <Modal
-                title="Thêm vào danh sách phát"
-                style={{
-                    top: 50,
-                }}
-                open={isModalOpen}
-                onOk={addToPlaylist}
-                onCancel={()=>setIsModalOpen(false)}
-                okText="Thêm"
-                cancelText="Hủy"
-                okButtonProps={{className: "bg-blue-500"}}
-            >
-                <p>Chọn danh sách phát:</p>
-                <Select
-                    style={{
-                        width: 200,
-                    }}
-                    defaultValue={"choose Playlist"}
-                    onChange={(i)=>setPlaylist(i)}
-                    options={dataPlaylist}
-                />
-            </Modal>
             {Footer()}
         </>
     );

@@ -6,96 +6,67 @@ import { Modal, Pagination } from "antd";
 import Footer from "../component/Footer";
 import { useCookies } from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
+import toCamelCase from "../utils/toCamelCase";
 
-export default function Lesson() {
+export default function LessonPlaylist() {
 
-    const { slug } = useParams();
+    const { id } = useParams();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalSpeakOpen, setIsModalSpeakOpen] = useState(false);
-    const [dataLesson, setdataLesson] = useState([]);
-    const [dataUserTopic, setDataUserTopic] = useState({});
+    const [dataLessonPlaylist, setdataLessonPlaylist] = useState([]);
     const [pagination, setPagination] = useState({
       page: 1,
       pageSize: 12,
     });
     const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
-    const lesson = async () => {
+    const lessonPlaylist = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlugTopic/${slug}`, {params: pagination});
-          setdataLesson(response?.data[0]);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/lessonplaylist/playlist/${id}`,
+              {params: pagination, headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${cookies?.user?.token}`
+              }});
+          setdataLessonPlaylist(response?.data.data);
+          console.log(response?.data.data)
         } catch (error) {
           console.error(error);
         }
     }
 
-    const userTopic = async () => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/usertopic`, {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookies?.user?.token}`
-                }
-            });
-            setDataUserTopic(response?.data[0]);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     useEffect(() => {
-        lesson();
-        userTopic();
+        lessonPlaylist();
     },[]);
 
     return (
         <>
             <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
-                <p className="text-4xl text-center py-10">{dataLesson?.title}</p>
 
                 <div class="grid grid-cols-4 gap-4 text-center pt-[40px] text-white h-full">
-                    {dataLesson?.lesson?.map((lesson, index) =>
+                    {dataLessonPlaylist?.map((lessonPlaylist, index) =>
                         <div class="col-span-1 text-center pt-[40px] text-white" key={index}>
                                 <div class="bg-gradient-to-r from-red-500 to-red-800 rounded-t-md">
                                     <div className="p-5">
                                         <center>
                                             <img src={cd} className="h-20 w-20"/>
                                         </center>
-                                        <p className="pt-[10px] font-semibold text-xl">{ lesson.id +". "+ lesson.title }</p>
+                                        <p className="pt-[10px] font-semibold text-xl">{ toCamelCase(lessonPlaylist.track) +". "+ lessonPlaylist.title }</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2">
-                                    {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
-                                    && cookies?.user?.vip_expire_at !== null
-                                        || +dataUserTopic?.lesson_id >= +lesson.id || +index === 0
-                                    ?
                                         <>
-                                            <Link to={"/lesson/detail/"+ lesson?.slug} state={{ index: index }}>
+                                            <Link to={"/playlist/detail/"+ lessonPlaylist?.playlist_id}>
                                                 <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
                                                     Audio
                                                 </div>
                                             </Link>
-                                            <Link to={"/lesson/speaking/"+ lesson?.slug} state={{ index: index }}>
+                                            <Link to={"/lesson/speaking/"+ lessonPlaylist?.slug}>
                                                 <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
                                                     Speaking
                                                 </div>
                                             </Link>
                                         </>
-                                    :
-                                        <>
-                                            <Link onClick={()=>setIsModalOpen(true)}>
-                                                <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
-                                                    Audio
-                                                </div>
-                                            </Link>
-                                            <Link onClick={()=>setIsModalOpen(true)}>
-                                                <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
-                                                    Speaking
-                                                </div>
-                                            </Link>
-                                        </>
-                                    }
                                 </div>
                         </div>
                     )}
@@ -104,7 +75,7 @@ export default function Lesson() {
                 <Pagination
                     className="flex justify-center pt-[50px]"
                     current={pagination.page}
-                    total={dataLesson?.total}
+                    total={dataLessonPlaylist?.total}
                     pageSize={pagination.pageSize}
                     onChange={(p, ps)=> {
                         setPagination({
