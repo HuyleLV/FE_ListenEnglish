@@ -17,7 +17,6 @@ const Login = () => {
     await axios
       .post(`${process.env.REACT_APP_API_URL}/user/login`, values)
       .then((res) => {
-        console.log(res?.data);
         setCookieToken("accessToken", res?.data);
         message.success("Đăng nhập thành công!");
         navigate("/");
@@ -30,7 +29,6 @@ const Login = () => {
   };
 
   const loginGmail = async(credentialResponse) => {
-    console.log(credentialResponse?.credential);
     await axios
       .post(`${process.env.REACT_APP_API_URL}/auth/login`, {
         headers: {
@@ -40,7 +38,6 @@ const Login = () => {
         googleId: credentialResponse?.credential,
       })
       .then((res) => {
-        console.log(res?.data);
         setCookie("user", res?.data);
         message.success("Đăng nhập thành công!");
         navigate("/");
@@ -60,9 +57,9 @@ const Login = () => {
           <Col lg={14} xs={22} style={{ maxWidth: 380 }}>
             <Form
               onFinish={loginUser}
-              onFinishFailed={onFinishFailed} 
-              name="basic" 
-              layout={"vertical"} 
+              onFinishFailed={onFinishFailed}
+              name="basic"
+              layout={"vertical"}
               colon={false}>
               <Form.Item name="email">
                 <Input

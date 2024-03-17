@@ -15,7 +15,6 @@ export default function RankingStreak() {
         try {
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/user/streakRank`);
           setDataRankStreak(response?.data);
-          console.log(response?.data);
         } catch (error) {
           console.error(error);
         }
@@ -40,8 +39,8 @@ export default function RankingStreak() {
                             </tr>
                         </thead>
                         <tbody className='text-center'>
-                            {dataRankStreak?.map((_, index) => 
-                                <tr className='p-5'>    
+                            {dataRankStreak?.map((_, index) =>
+                                <tr className='p-5'>
                                     <td>{index+1}</td>
                                     <td className='flex justify-center py-5'><img src={_?.avatar ? _?.avatar : logo} className={isMobile? 'w-[30px] rounded-full' : 'w-[70px] rounded-full'}/></td>
                                     <td className='font-semibold'>{_?.username}</td>

@@ -51,7 +51,6 @@ export default function LessonDetail() {
       create_by: cookies.admin[0]?.id
     };
 
-    console.log(submitValues);
 
     try {
       if (slug && slug !== "create") {

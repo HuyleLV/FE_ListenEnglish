@@ -21,7 +21,7 @@ export default function LessonDetail() {
     const { slug } = useParams();
     const { isMobile } = useDevice();
     const location = useLocation();
-    const index = location?.state;
+    const index = location?.state?.index;
 
     const [story, setStory] = useState("Main Story");
     const [dataPlaylist, setdataPlaylist] = useState([]);
@@ -188,6 +188,7 @@ export default function LessonDetail() {
                 })
             .then(() => {
                 message.success("Thêm vào playlist thành công!");
+                setIsModalOpen(false)
             }).catch(e => {
                 console.log(e);
                 message.success("Thêm vào playlist thành công!");
@@ -205,8 +206,10 @@ export default function LessonDetail() {
     useEffect(() => {
         lesson();
         getNews();
-        playlist();
-        userTopic();
+        if (cookies?.user) {
+            playlist();
+            userTopic();
+        }
     }, []);
 
     useEffect(() => {
@@ -214,7 +217,7 @@ export default function LessonDetail() {
             try {
                 audioElem.current.play();
             }catch (e) {
-                console.log(e)
+                console.error(e)
             }
             // setisPlaying(true);
         }
@@ -231,7 +234,6 @@ export default function LessonDetail() {
     }, [dataLesson])
 
     useEffect(() => {
-        console.log(dataUserTopic)
         if (dataUserTopic?.lesson_id) {
             if(dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
                 && cookies?.user?.vip_expire_at !== null
@@ -241,7 +243,7 @@ export default function LessonDetail() {
                 navigate("/");
             }
         }
-        if (!index) navigate("/");
+        if (index === undefined) navigate("/");
     }, [cookies, dataUserTopic])
 
     return (

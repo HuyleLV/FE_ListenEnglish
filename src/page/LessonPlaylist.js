@@ -29,7 +29,6 @@ export default function LessonPlaylist() {
                   'Authorization': `Bearer ${cookies?.user?.token}`
               }});
           setdataLessonPlaylist(response?.data.data);
-          console.log(response?.data.data)
         } catch (error) {
           console.error(error);
         }
@@ -56,12 +55,12 @@ export default function LessonPlaylist() {
                                 </div>
                                 <div className="grid grid-cols-2">
                                         <>
-                                            <Link to={"/playlist/detail/"+ lessonPlaylist?.playlist_id}>
+                                            <Link to={"/playlist/detail/"+ lessonPlaylist?.playlist_id} state={{ index: index }}>
                                                 <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
                                                     Audio
                                                 </div>
                                             </Link>
-                                            <Link to={"/lesson/speaking/"+ lessonPlaylist?.slug}>
+                                            <Link to={"/lesson/speaking/"+ lessonPlaylist?.slug} state={{ index: 0 }}>
                                                 <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
                                                     Speaking
                                                 </div>

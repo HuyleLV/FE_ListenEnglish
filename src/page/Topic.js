@@ -32,7 +32,7 @@ export default function Topic() {
                 <p className="text-4xl text-center py-10">Tất cả chương trình học</p>
                 <Row className={isMobile ? 'text-center pt-[40px] text-white flex justify-center' : 'text-center pt-[40px] text-white'}>
                     {dataTopic?.data?.map((topic, index) =>
-                        <Col xs={24} xl={6}>
+                        <Col xs={24} xl={6} key={index}>
                             <Link to={"/lesson/" + topic.slug}>
                                 <div className='bg-gradient-to-r from-red-500 to-red-800 rounded-xl m-2 p-10 h-[150px]'>
                                     <p className="pt-[10px] font-semibold text-xl">{topic.id + ". " + topic.title}</p>

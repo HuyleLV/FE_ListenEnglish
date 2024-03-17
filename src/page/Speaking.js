@@ -27,7 +27,7 @@ export default function Speaking() {
     const { slug } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const index = location?.state;
+    const index = location?.state?.index;
 
     const containerRef = useRef(null);
     const [dataLesson, setdataLesson] = useState([]);
@@ -52,7 +52,6 @@ export default function Speaking() {
     const convertString = (track) => {
         if( track ) {
             const data = track.split('\n').map(el => el.slice(el.indexOf(']')+1));
-            console.log(data)
             const dataNew = [];
             for(let i = 0; i < data.length; i++) {
                     dataNew.push(data[i]);
@@ -73,7 +72,6 @@ export default function Speaking() {
     }
 
     const handleRecord = async result => {
-        console.log('Handle record...');
         try {
             let point = 0;
             const text = result;
@@ -159,8 +157,10 @@ export default function Speaking() {
 
     useEffect( () => {
         lesson();
-        getRecords();
-        userTopic();
+        if (cookies?.user) {
+            getRecords();
+            userTopic();
+        }
     }, []);
 
     useEffect(() => {
@@ -186,7 +186,6 @@ export default function Speaking() {
                     : story === 'POV' ? dataLesson?.POV
                         : dataLesson?.comment);
         const options = [];
-        console.log(dataLesson);
         if (dataLesson?.mainStory) options.push('Main Story');
         if (dataLesson?.vocabulary) options.push('Vocabulary');
         if (dataLesson?.miniStory) options.push('Mini Story');
@@ -209,7 +208,7 @@ export default function Speaking() {
                 navigate("/");
             }
         }
-        if (!index || !cookies?.user) navigate("/");
+        if (index === undefined || !cookies?.user) navigate("/");
     }, [cookies])
 
     return (

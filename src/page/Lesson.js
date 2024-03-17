@@ -46,7 +46,7 @@ export default function Lesson() {
 
     useEffect(() => {
         lesson();
-        userTopic();
+        if (cookies?.user) userTopic();
     },[]);
 
     return (

@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useTimer from "../component/UseTimer";
-import cd from "../component/icon/cd.png"
 import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
 import Control from "../component/Control";
 import { songsdata } from "../component/audio";
-import { useNavigate, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Footer from "../component/Footer";
 import { Breadcrumb, Col, List, Row } from "antd";
 import parse from "html-react-parser";
 import { useDevice } from "../hooks/useDevice";
 import { useCookies } from "react-cookie";
-import dayjsInstance from "../utils/dayjs";
 import { Segmented } from 'antd';
 import toCamelCase from "../utils/toCamelCase";
 
@@ -19,6 +17,9 @@ export default function PlaylistDetail() {
 
     const { id } = useParams();
     const { isMobile } = useDevice();
+    const location = useLocation();
+    const index = location?.state?.index;
+
     const [story, setStory] = useState(0);
     const [segment, setSegment] = useState("");
     const navigate = useNavigate();
@@ -79,7 +80,6 @@ export default function PlaylistDetail() {
                         'Authorization': `Bearer ${cookies?.user?.token}`
                     }});
             setdataLessonPlaylist(response?.data.data);
-            console.log(response?.data.data)
         } catch (error) {
             console.error(error);
         }
@@ -150,10 +150,14 @@ export default function PlaylistDetail() {
     }, []);
 
     useEffect(() => {
-        const option = [];
-        dataLessonPlaylist.forEach(el => option.push(el.title + ' - ' + toCamelCase( el.track)))
-        setOptions(option);
-        setSegment(option[0] || "")
+        if (dataLessonPlaylist.length > 0 ) {
+            const option = [];
+            dataLessonPlaylist.forEach(el => option.push(el.title + ' - ' + toCamelCase( el.track)))
+            setOptions(option);
+            // setSegment(option[index] || "")
+            setSegment(option[+index] || "")
+            setStory(+index);
+        }
     }, [dataLessonPlaylist]);
 
     // useEffect(() => {

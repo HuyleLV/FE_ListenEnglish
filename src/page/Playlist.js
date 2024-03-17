@@ -37,7 +37,7 @@ export default function Playlist() {
     }
 
     useEffect(() => {
-        playlist();
+        if (cookies?.user) playlist();
     },[]);
 
     const handleEditPlaylist = (id) => {
