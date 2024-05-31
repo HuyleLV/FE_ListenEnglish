@@ -390,7 +390,7 @@ export default function LessonDetail() {
                                 dataSource={news?.data}
                                 renderItem={(item, index) => (
                                     <div className='mx-2 mt-4 bg-white drop-shadow p-5 w-[600px]'>
-                                        <a href={"/blog/" + item?.blog_id} className='text-2xl font-bold'>{item?.blog_title}</a>
+                                        <a href={"/blog/" + item?.blog_slug} className='text-2xl font-bold'>{item?.blog_title}</a>
                                         <div className='flex justify-center py-5'>
                                             <img src={item?.blog_image} className=' h-[300px] rounded'/>
                                         </div>
@@ -408,12 +408,12 @@ export default function LessonDetail() {
                                 dataSource={news?.data}
                                 renderItem={(item, index) => (
                                     <div className='mx-2 mt-4 bg-white drop-shadow p-5 w-[340px]'>
-                                        <a href={"/blog/" + item?.blog_id} className='text-2xl font-bold'>{item?.blog_title}</a>
+                                        <a href={"/blog/" + item?.blog_slug} className='text-2xl font-bold'>{item?.blog_title}</a>
                                         <div className='flex justify-center py-5'>
                                             <img src={item?.blog_image} className=' h-[200px] rounded'/>
                                         </div>
                                         <p className='font-semibold py-5 text-slate-600 h-20 truncate'>{parse(String(item?.blog_description))}</p>
-                                        <a href={"/blog/" + item?.blog_id} className="flex justify-center">
+                                        <a href={"/blog/" + item?.blog_slug} className="flex justify-center">
                                             <button className='bg-[#2ca1db] px-5 py-2 my-5 text-white font-bold'>
                                                 Continue Reading
                                             </button>

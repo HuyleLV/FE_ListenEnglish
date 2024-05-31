@@ -37,7 +37,7 @@ export default function Blog() {
                             dataSource={news?.data}
                             renderItem={(item, index) => (
                                 <div className='p-5 mt-4 bg-white drop-shadow'>
-                                    <a href={"/blog/" + item?.blog_id} className='text-2xl font-bold'>{item?.blog_title}</a>
+                                    <a href={"/blog/" + item?.blog_slug} className='text-2xl font-bold'>{item?.blog_title}</a>
                                     <div className='flex justify-center py-5'>
                                         <img src={item?.blog_image} className=' h-[300px] rounded'/>
                                     </div>
@@ -77,7 +77,7 @@ export default function Blog() {
                                 dataSource={news?.data}
                                 renderItem={(item, index) => (
                                     <div className='pt-4'>
-                                        <a href={"/blog/" + item?.blog_id} className='text-lg font-normal text-[#1e73be]'>{item?.blog_title}</a>
+                                        <a href={"/blog/" + item?.blog_slug} className='text-lg font-normal text-[#1e73be]'>{item?.blog_title}</a>
                                     </div>
                                 )}
                             />
