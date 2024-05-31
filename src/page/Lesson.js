@@ -19,6 +19,7 @@ export default function Lesson() {
       pageSize: 12,
     });
     const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+    const navigate = useNavigate();
 
     const lesson = async () => {
         try {
@@ -116,7 +117,7 @@ export default function Lesson() {
             </div>
             {Footer()}
 
-            <Modal open={isModalOpen} onOk={()=>setIsModalOpen(false)} onCancel={()=>setIsModalOpen(false)} okButtonProps={{ className: "bg-blue-500" }}>
+            <Modal open={isModalOpen} onOk={()=> cookies?.user ? navigate(`/profile/${cookies.user.id}`) : navigate('/login')} onCancel={()=>setIsModalOpen(false)} okButtonProps={{ className: "bg-blue-500" }}>
                 <p className="text-xl font-bold py-2 pt-8">Vui lòng truy cập vào profile và </p>
                 <p className="text-xl font-bold py-2 pb-8">đăng ký gói vip để được sử dụng dịch vụ này</p>
             </Modal>

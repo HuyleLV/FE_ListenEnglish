@@ -208,7 +208,7 @@ export default function Speaking() {
                 navigate("/");
             }
         }
-        if (index === undefined || !cookies?.user) navigate("/");
+        if (index === undefined || !cookies?.user) navigate("/login");
     }, [cookies])
 
     return (

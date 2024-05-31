@@ -12,7 +12,7 @@ import repeatOff from "../component/icon/repeat-off.png"
 import repeatOne from "../component/icon/repeat-one.png"
 import repeatTrack from "../component/icon/repeat-track.png"
 import { BarsOutlined } from '@ant-design/icons';
-import { useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import formatSecondToTime from "../utils/formatSecondToTime";
 
@@ -40,7 +40,7 @@ function Control({
   const { lesson_id } = useParams();
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const [soundMode, setSoundMode] = useState('volume-high');
-
+  const navigate = useNavigate();
 
   const PlayPause = () => {
     try {
@@ -120,7 +120,7 @@ function Control({
           <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={changeSoundMode}>
             <img src={audioElem.current?.volume === 1 ? volumeHigh : audioElem.current?.volume === 0.25 ? volumeLow : audioElem.current?.volume === 0.5 ? volumeMedium : volumeMute} className='w-10 h-10'/>
           </button>
-          {!isPlaylist && <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={openModal}>
+          {!isPlaylist && <button type="button" className='mx-5 rounded-full p-4 bg-orange-600' onClick={() => cookies?.user ? openModal() : navigate('/login')}>
             <BarsOutlined className='w-10 h-10 flex justify-center text-white text-4xl font-bold'/>
           </button>}
         </div>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import Footer from "../component/Footer";
 import { useCookies } from "react-cookie";
 import {useDevice} from "../hooks";
@@ -22,6 +22,7 @@ export default function Playlist() {
         page: 1,
         pageSize: 12,
     });
+    const navigate = useNavigate();
 
     const playlist = async () => {
         try {
@@ -38,6 +39,7 @@ export default function Playlist() {
 
     useEffect(() => {
         if (cookies?.user) playlist();
+        else navigate('/login');
     },[]);
 
     const handleEditPlaylist = (id) => {
