@@ -26,7 +26,7 @@ export default function UsersDashboard() {
 
   const removeUser = async (user_id) => {
     await axios
-      .delete(`${process.env.REACT_APP_API_URL}/admin/delete/${user_id}`)
+      .delete(`${process.env.REACT_APP_API_URL}/admin/deleteUser/${user_id}`)
       .finally(() => {
         fetchUser();
         message.success("Xoá thành công");
@@ -36,7 +36,7 @@ export default function UsersDashboard() {
   const confirmDelete = (user_id) => {
     Modal.confirm({
       icon: <ExclamationCircleOutlined />,
-      content: "Bạn có chắc chắn xoá comment này?",
+      content: "Bạn có chắc chắn xoá user này?",
       okText: "Xác nhận",
       cancelText: "Huỷ",
       onOk: () => removeUser(user_id),
@@ -49,7 +49,7 @@ export default function UsersDashboard() {
 
   const updateUser = async (value, id) => {
     await axios
-      .post(`${process.env.REACT_APP_API_URL}/admin/update/${id}`, {role: value})
+      .post(`${process.env.REACT_APP_API_URL}/admin/updateUser/${id}`, {role: value})
       .finally(() => {
         fetchUser();
         message.success("Cập nhật thành công!");
@@ -108,7 +108,7 @@ export default function UsersDashboard() {
               className={"w-[100px]"}
               value={record?.role === 1 ? "User" : "Admin"}
               defaultValue={record?.role === 1 ? "User" : "Admin"}
-              onChange={(value) => updateUser(value, record?.user_id)}
+              onChange={(value) => updateUser(value, record?.id)}
             />
           </div>
         );
@@ -139,7 +139,7 @@ export default function UsersDashboard() {
           <Space>
             <div
               className={"text-[var(--red)]"}
-              onClick={() => confirmDelete(record?.user_id)}
+              onClick={() => confirmDelete(record?.id)}
             >
               <DeleteOutlined />
             </div>
