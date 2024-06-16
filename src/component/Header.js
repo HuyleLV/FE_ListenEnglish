@@ -72,6 +72,11 @@ export default function Header() {
         <div class={`${openNav ? "" : "hidden"} w-full md:block md:w-auto`}>
           <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 text-black-800 md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li className="pt-1">
+              <Link className={location?.pathname.includes("/spell-checker") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/spell-checker"}>
+                Spell Checker
+              </Link>
+            </li>
+            <li className="pt-1">
               <Link className={location?.pathname.includes("/topic") ? "block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/topic"}>
                 Topic
               </Link>
@@ -117,7 +122,7 @@ export default function Header() {
                   <img src={cookies?.user?.avatar} className="h-8"/>
                 </Dropdown>
               </li>
-              : 
+              :
               <li className="pt-1">
                 <Link className={location?.pathname.includes("/login") ?"block md:p-0 font-bold text-red-700" : "block md:p-0 md:hover:text-black"} to={"/login"}>
                   Login

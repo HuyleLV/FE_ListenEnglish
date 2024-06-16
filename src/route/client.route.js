@@ -14,6 +14,7 @@ import Speaking from "../page/Speaking";
 import Playlist from "../page/Playlist";
 import LessonPlaylist from "../page/LessonPlaylist";
 import PlaylistDetail from "../page/PlaylistDetail";
+import SpellChecker from "../page/SpellChecker";
 
 export const Client = () => {
     return (
@@ -33,6 +34,7 @@ export const Client = () => {
         <Route path="/profile/:user_id" element={<Profile />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/login" element={<Login/>} />
+        <Route path="/spell-checker" element={<SpellChecker/>} />
       </Routes>
     );
   };
