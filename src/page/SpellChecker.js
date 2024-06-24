@@ -4,6 +4,7 @@ import {useEffect} from 'react';
 import Footer from '../component/Footer';
 import TextArea from "antd/es/input/TextArea";
 
+
 export default function SpellChecker() {
     const [form] = Form.useForm();
     useEffect(() => {
@@ -28,7 +29,7 @@ export default function SpellChecker() {
 
     const checkSpelling = async (text) => {
         const response = await axios.get(
-            `https://1059-35-234-2-53.ngrok-free.app/predict?text=${text}`,
+            `https://54c0-34-85-137-87.ngrok-free.app/predict?text=${text}`,
             {
                 headers: {
                     'ngrok-skip-browser-warning': 'true'
