@@ -207,6 +207,18 @@ export default function LessonForm({
                         </Form.Item>
                     </Col>
                 </Row>
+                <Form.Item
+                    label={"Ảnh lesson"}
+                    name="lesson_url"
+                    rules={[{required: true, message: "Vui lòng chọn ảnh!"}]}
+                >
+                    <CustomUpload type="image" accept=".png, .jpg, .jpeg, .jfif"/>
+                </Form.Item>
+                <Form.Item
+                    name="lesson_url"
+                >
+                    <Input size="large" placeholder={"Nhập url"}/>
+                </Form.Item>
                 <Row>
                     <Col span={12} className="px-10">
                         <Form.Item
