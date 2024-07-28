@@ -64,11 +64,11 @@ export default function LessonDashboard() {
             render: (_, record) => <div><Image src={record?.lesson_url} width={50}/></div>,
         },
         {
-            title: <div className={"base-table-cell-label"}>Topic</div>,
-            key: "topic_title",
-            dataIndex: "topic_title",
+            title: <div className={"base-table-cell-label"}>Course</div>,
+            key: "course_title",
+            dataIndex: "course_title",
             width: 200,
-            render: (_, record) => <div>{record?.topic_title}</div>,
+            render: (_, record) => <div>{record?.course_title}</div>,
         },
         {
             title: <div className={"base-table-cell-label "}>Ngày tạo</div>,

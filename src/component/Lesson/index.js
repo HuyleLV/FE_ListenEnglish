@@ -16,18 +16,18 @@ export default function LessonForm({
                                    }) {
     const navigate = useNavigate();
     const [form] = Form.useForm();
-    const [topic, setTopic] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [pagination, setPagination] = useState({
         page: 1,
         pageSize: 12,
     });
 
-    const fetchTopic = async () => {
+    const fetchCourses = async () => {
         try {
             const result = await axios.get(
-                `${process.env.REACT_APP_API_URL}/topic/getAll`, {params: pagination}
+                `${process.env.REACT_APP_API_URL}/course/getAll`, {params: pagination}
             );
-            setTopic(result?.data?.data);
+            setCourses(result?.data?.data);
         } catch (e) {
             message.error(e);
         }
@@ -47,7 +47,7 @@ export default function LessonForm({
     };
 
     useEffect(() => {
-        fetchTopic();
+        fetchCourses();
         if (Object.keys(initialValues)?.length > 0) {
             form.resetFields();
         }
@@ -109,6 +109,8 @@ export default function LessonForm({
                         <Form.Item
                             label={"mainStory Audio"}
                             name="mainStoryAudio"
+                            rules={[{required: true, message: "Vui lòng chọn audio!"}]}
+
                         >
                             <Input size="large" placeholder={"Nhập url"}/>
 
@@ -120,12 +122,24 @@ export default function LessonForm({
                         >
                             <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif"/>
                         </Form.Item>
+                        <Form.Item
+                            label={"mainStory Video"}
+                            name="mainStoryVideo"
+                        >
+                            <Input size="large" placeholder={"Nhập url"}/>
+
+                        </Form.Item>
+                        <Form.Item
+                            className="flex justify-center"
+                            name="mainStoryVideo"
+                        >
+                            <CustomUpload type="file" accept=".mp4, .webm, .ogg, .mov, .m4v"/>
+                        </Form.Item>
                     </Col>
                     <Col span={4} className="mx-4">
                         <Form.Item
                             label={"vocabulary"}
                             name="vocabulary"
-                            rules={[{required: true, message: "Vui lòng nhập tên!"}]}
                         >
                             <TextArea placeholder={"Nhập"} style={{height: "500px"}}/>
                         </Form.Item>
@@ -141,6 +155,19 @@ export default function LessonForm({
                             name="vocabularyAudio"
                         >
                             <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif"/>
+                        </Form.Item>
+                        <Form.Item
+                            label={"vocabulary Video"}
+                            name="vocabularyVideo"
+                        >
+                            <Input size="large" placeholder={"Nhập url"}/>
+
+                        </Form.Item>
+                        <Form.Item
+                            className="flex justify-center"
+                            name="vocabularyVideo"
+                        >
+                            <CustomUpload type="file" accept=".mp4, .webm, .ogg, .mov, .m4v"/>
                         </Form.Item>
                     </Col>
                     <Col span={4} className="mx-4">
@@ -163,6 +190,19 @@ export default function LessonForm({
                         >
                             <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif"/>
                         </Form.Item>
+                        <Form.Item
+                            label={"miniStory Video"}
+                            name="miniStoryVideo"
+                        >
+                            <Input size="large" placeholder={"Nhập url"}/>
+
+                        </Form.Item>
+                        <Form.Item
+                            className="flex justify-center"
+                            name="miniStoryVideo"
+                        >
+                            <CustomUpload type="file" accept=".mp4, .webm, .ogg, .mov, .m4v"/>
+                        </Form.Item>
                     </Col>
                     <Col span={4} className="mx-4">
                         <Form.Item
@@ -184,6 +224,19 @@ export default function LessonForm({
                         >
                             <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif"/>
                         </Form.Item>
+                        <Form.Item
+                            label={"POV Video"}
+                            name="POVVideo"
+                        >
+                            <Input size="large" placeholder={"Nhập url"}/>
+
+                        </Form.Item>
+                        <Form.Item
+                            className="flex justify-center"
+                            name="POVVideo"
+                        >
+                            <CustomUpload type="file" accept=".mp4, .webm, .ogg, .mov, .m4v"/>
+                        </Form.Item>
                     </Col>
                     <Col span={4} className="ml-4">
                         <Form.Item
@@ -204,6 +257,19 @@ export default function LessonForm({
                             name="commentAudio"
                         >
                             <CustomUpload type="file" accept=".mp3, .jpg, .jpeg, .jfif"/>
+                        </Form.Item>
+                        <Form.Item
+                            label={"comment Video"}
+                            name="commentVideo"
+                        >
+                            <Input size="large" placeholder={"Nhập url"}/>
+
+                        </Form.Item>
+                        <Form.Item
+                            className="flex justify-center"
+                            name="commentVideo"
+                        >
+                            <CustomUpload type="file" accept=".mp4, .webm, .ogg, .mov, .m4v"/>
                         </Form.Item>
                     </Col>
                 </Row>
@@ -246,16 +312,16 @@ export default function LessonForm({
                     </Col>
                     <Col span={12} className="px-10">
                         <Form.Item
-                            label={"Topic"}
-                            name="topic_id"
-                            rules={[{required: true, message: "Vui lòng chọn Topic!"}]}
+                            label={"Course"}
+                            name="course_id"
+                            rules={[{required: true, message: "Vui lòng chọn Course!"}]}
                         >
                             <Select
                                 showSearch
                                 size="large"
                                 placeholder="Select a person"
                                 optionFilterProp="children"
-                                options={topic?.map((value) => ({
+                                options={courses?.map((value) => ({
                                     value: value.id,
                                     label: value.title,
                                 }))}
