@@ -1,25 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import useTimer from "../component/UseTimer";
-import cd from "../component/icon/cd.png"
-import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
+import {Lrc, useRecoverAutoScrollImmediately} from "react-lrc";
 import Control from "../component/Control";
-import { songsdata } from "../component/audio";
+import {songsdata} from "../component/audio";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Footer from "../component/Footer";
-import {Breadcrumb, Col, List, message, Modal, Row, Select} from "antd";
+import {Breadcrumb, List, message, Modal, Segmented, Select} from "antd";
 import parse from "html-react-parser";
-import { useDevice } from "../hooks/useDevice";
-import { useCookies } from "react-cookie";
+import {useDevice} from "../hooks/useDevice";
+import {useCookies} from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
-import { Segmented } from 'antd';
-import toCamelCase from "../utils/toCamelCase";
 import toLowerCamelCase from "../utils/toLowerCamelCase";
+import ReactPlayer from "react-player";
 
 export default function LessonDetail() {
-
-    const { slug } = useParams();
-    const { isMobile } = useDevice();
+    const {slug} = useParams();
+    const {isMobile} = useDevice();
     const location = useLocation();
     const index = location?.state?.index;
 
@@ -40,11 +37,12 @@ export default function LessonDetail() {
     const [dataLesson, setdataLesson] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataUserTopic, setDataUserTopic] = useState({});
+    const [speedFlag, setSpeedFlag] = useState(false);
 
     const [pagination, setPagination] = useState({
         page: 1,
         pageSize: 4,
-      });
+    });
     const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
     const {
@@ -60,20 +58,22 @@ export default function LessonDetail() {
         recoverAutoScrollImmediately
     } = useRecoverAutoScrollImmediately();
 
+    const videoPlayerRef = useRef();
+
     const onPlaying = () => {
         const duration = audioElem.current.duration;
         const ct = audioElem.current.currentTime;
         setcurrentTime(ct * 1000);
 
-        setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
+        setCurrentSong({...currentSong, "progress": ct / duration * 100, "length": duration});
     }
 
     const getNews = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getAll`, {params: pagination});
-          setdataNews(response?.data);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getAll`, {params: pagination});
+            setdataNews(response?.data);
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     }
 
@@ -82,20 +82,22 @@ export default function LessonDetail() {
             await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlug/` + slug)
                 .then(response => setdataLesson(response.data[0]));
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     }
 
     const playlist = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/playlist`, {params: {
-            page: 1,
-            pageSize: 12,
-          }, headers: {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/playlist`, {
+                params: {
+                    page: 1,
+                    pageSize: 12,
+                }, headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${cookies?.user?.token}`
-                }});
+                }
+            });
             const playlists = []
             response?.data.data.forEach(el => playlists.push({value: el.id, label: el.title}))
             setdataPlaylist(playlists);
@@ -133,17 +135,15 @@ export default function LessonDetail() {
 
     const changeSpeedMode = () => {
         const playbackRate = audioElem.current?.playbackRate;
-        if (speedMode !== 2 && playbackRate !== undefined) {
-            if (playbackRate === 0.5) {
-                setSpeedMode(speedMode+0.5);
-                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.5;
+        if (playbackRate) {
+            if (!speedFlag || speedMode === 2) {
+                setSpeedFlag(true);
+                setSpeedMode(0.5);
+                audioElem.current.playbackRate = 0.5;
             } else {
-                setSpeedMode(speedMode+0.25);
-                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.25;
+                audioElem.current.playbackRate = speedMode + 0.25;
+                setSpeedMode(speedMode + 0.25);
             }
-        } else if (playbackRate !== undefined) {
-            setSpeedMode(0.5);
-            audioElem.current.playbackRate = 0.5;
         }
     };
 
@@ -164,9 +164,10 @@ export default function LessonDetail() {
     };
 
     const handleEnded = () => {
-        if(repeatMode === 'track') {
-            setStory(options[options.indexOf(story)+1]);
-        };
+        if (repeatMode === 'track') {
+            setStory(options[options.indexOf(story) + 1]);
+        }
+
     }
 
     const openModal = () => {
@@ -185,7 +186,7 @@ export default function LessonDetail() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${cookies?.user?.token}`
                 }
-                })
+            })
             .then(() => {
                 message.success("Thêm vào playlist thành công!");
                 setIsModalOpen(false)
@@ -194,14 +195,6 @@ export default function LessonDetail() {
                 message.success("Thêm vào playlist thành công!");
             })
     }
-
-    // useEffect(() => {
-    //     if (isPlaying) {
-    //         audioElem.current.play();
-    //     } else {
-    //         audioElem.current.pause();
-    //     }
-    // }, [isPlaying, dataLesson])
 
     useEffect(() => {
         lesson();
@@ -216,7 +209,7 @@ export default function LessonDetail() {
         if (isPlaying) {
             try {
                 audioElem.current.play();
-            }catch (e) {
+            } catch (e) {
                 console.error(e)
             }
             // setisPlaying(true);
@@ -235,9 +228,9 @@ export default function LessonDetail() {
 
     useEffect(() => {
         if (dataUserTopic?.lesson_id) {
-            if(dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
+            if (dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
                 && cookies?.user?.vip_expire_at !== null
-                || +dataUserTopic?.lesson_id >= +dataLesson.id || +index === 0){
+                || +dataUserTopic?.lesson_id >= +dataLesson.id || +index === 0) {
 
             } else {
                 navigate("/");
@@ -248,7 +241,7 @@ export default function LessonDetail() {
 
     return (
         <>
-            <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+            <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
                 <Breadcrumb
                     className="py-5"
                     items={[
@@ -259,7 +252,7 @@ export default function LessonDetail() {
                             title: <a href="/topic">Topic</a>,
                         },
                         {
-                            title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_title}</a>,
+                            title: <a href={"/lesson/" + dataLesson?.course_slug}>{dataLesson?.course_title}</a>,
                         },
                         {
                             title: dataLesson?.title,
@@ -271,37 +264,49 @@ export default function LessonDetail() {
                     className="my-[20px]"
                     options={options}
                     value={story}
-                    onChange={(e)=> {
+                    onChange={(e) => {
                         setStory(e);
                         setisPlaying(false);
                     }}
-                    block />
+                    block/>
                 <div>
                     <audio
                         src={story === "Main Story"
-                        ? dataLesson?.mainStoryAudio
-                        : story === "Vocabulary"
-                            ? dataLesson?.vocabularyAudio
-                            : story === "Mini Story"
-                                ? dataLesson?.miniStoryAudio
-                                : null
+                            ? dataLesson?.mainStoryAudio
+                            : story === "Vocabulary"
+                                ? dataLesson?.vocabularyAudio
+                                : story === "Mini Story"
+                                    ? dataLesson?.miniStoryAudio
+                                    : null
                         }
                         ref={audioElem}
                         loop={repeatMode === 'one'}
                         onTimeUpdate={onPlaying}
                         onEnded={handleEnded}
                     />
-                    {dataLesson?.mainStory && story === "Main Story"  ?
+                    <div
+                        className='flex justify-center'>
+                        {dataLesson[toLowerCamelCase(story) + 'Video'] ?
+                            <ReactPlayer url={dataLesson[toLowerCamelCase(story) + 'Video']}
+                                         ref={videoPlayerRef}
+                                         volume={0}
+                                         playing={isPlaying}/> :
+                            <img src={dataLesson?.lesson_url} width={640}
+                                 style={{objectFit: 'contain', height: 360}} alt={''}/>}
+                    </div>
+                    {dataLesson?.mainStory && story === "Main Story" ?
                         <>
                             <Lrc
                                 className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
+                                lineRenderer={({active, line: {content}}) =>
                                     (
                                         active ?
                                             <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
+                                                <p active={active}
+                                                   className="text-orange-500 font-bold text-xl">{content}</p>
                                             </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
+                                            : <p active={active}
+                                                 className="text-neutral-900 font-semibold text-xl">{content}</p>
                                     )
 
                                 }
@@ -313,48 +318,52 @@ export default function LessonDetail() {
                             />
                         </>
                         : story === "Vocabulary" ?
-                        <>
-                            <Lrc
-                                className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
-                                    (
-                                        active ?
-                                            <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
-                                            </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
-                                    )
+                            <>
+                                <Lrc
+                                    className="bg-red-100 p-10 h-screen"
+                                    lineRenderer={({active, line: {content}}) =>
+                                        (
+                                            active ?
+                                                <>
+                                                    <p active={active}
+                                                       className="text-orange-500 font-bold text-xl py-1">{content}</p>
+                                                </>
+                                                : <p active={active}
+                                                     className="text-neutral-900 font-semibold text-xl py-1">{content}</p>
+                                        )
 
-                                }
-                                currentMillisecond={currentTime}
-                                // verticalSpace
-                                recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
-                                lrc={dataLesson?.vocabulary}
-                            />
-                        </>
-                        : dataLesson?.miniStory && story === "Mini Story" ?
-                        <>
-                            <Lrc
-                                className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
-                                    (
-                                        active ?
-                                            <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
-                                            </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
-                                    )
+                                    }
+                                    currentMillisecond={currentTime}
+                                    // verticalSpace
+                                    recoverAutoScrollSingal={signal}
+                                    recoverAutoScrollInterval={5000}
+                                    lrc={dataLesson?.vocabulary}
+                                />
+                            </>
+                            : dataLesson?.miniStory && story === "Mini Story" ?
+                                <>
+                                    <Lrc
+                                        className="bg-red-100 p-10 h-screen"
+                                        lineRenderer={({active, line: {content}}) =>
+                                            (
+                                                active ?
+                                                    <>
+                                                        <p active={active}
+                                                           className="text-orange-500 font-bold text-xl">{content}</p>
+                                                    </>
+                                                    : <p active={active}
+                                                         className="text-neutral-900 font-semibold text-xl">{content}</p>
+                                            )
 
-                                }
-                                currentMillisecond={currentTime}
-                                // verticalSpace
-                                recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
-                                lrc={dataLesson?.miniStory}
-                            />
-                        </>
-                        : <></>
+                                        }
+                                        currentMillisecond={currentTime}
+                                        // verticalSpace
+                                        recoverAutoScrollSingal={signal}
+                                        recoverAutoScrollInterval={5000}
+                                        lrc={dataLesson?.miniStory}
+                                    />
+                                </>
+                                : <></>
                     }
                     <Control
                         onPlay={play}
@@ -376,6 +385,7 @@ export default function LessonDetail() {
                         changeSoundMode={changeSoundMode}
                         isPlaylist={false}
                         openModal={openModal}
+                        videoPlayerRef={videoPlayerRef}
                     />
                 </div>
                 <div className="py-10">
@@ -390,7 +400,8 @@ export default function LessonDetail() {
                                 dataSource={news?.data}
                                 renderItem={(item, index) => (
                                     <div className='mx-2 mt-4 bg-white drop-shadow p-5 w-[600px]'>
-                                        <a href={"/blog/" + item?.blog_slug} className='text-2xl font-bold'>{item?.blog_title}</a>
+                                        <a href={"/blog/" + item?.blog_slug}
+                                           className='text-2xl font-bold'>{item?.blog_title}</a>
                                         <div className='flex justify-center py-5'>
                                             <img src={item?.blog_image} className=' h-[300px] rounded'/>
                                         </div>
@@ -408,7 +419,8 @@ export default function LessonDetail() {
                                 dataSource={news?.data}
                                 renderItem={(item, index) => (
                                     <div className='mx-2 mt-4 bg-white drop-shadow p-5 w-[340px]'>
-                                        <a href={"/blog/" + item?.blog_slug} className='text-2xl font-bold'>{item?.blog_title}</a>
+                                        <a href={"/blog/" + item?.blog_slug}
+                                           className='text-2xl font-bold'>{item?.blog_title}</a>
                                         <div className='flex justify-center py-5'>
                                             <img src={item?.blog_image} className=' h-[200px] rounded'/>
                                         </div>
@@ -432,7 +444,7 @@ export default function LessonDetail() {
                 }}
                 open={isModalOpen}
                 onOk={addToPlaylist}
-                onCancel={()=>setIsModalOpen(false)}
+                onCancel={() => setIsModalOpen(false)}
                 okText="Thêm"
                 cancelText="Hủy"
                 okButtonProps={{className: "bg-blue-500"}}
@@ -443,7 +455,7 @@ export default function LessonDetail() {
                         width: 200,
                     }}
                     defaultValue={"choose Playlist"}
-                    onChange={(i)=>setPlaylist(i)}
+                    onChange={(i) => setPlaylist(i)}
                     options={dataPlaylist}
                 />
             </Modal>

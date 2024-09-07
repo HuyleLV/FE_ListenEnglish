@@ -1,30 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import useTimer from "../component/UseTimer";
-import cd from "../component/icon/cd.png"
-import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
-import Control from "../component/Control";
-import { songsdata } from "../component/audio";
+import React, {useEffect, useRef, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import {Breadcrumb, Modal, Segmented} from "antd";
-import { useCookies } from "react-cookie";
+import {useCookies} from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
 import {AudioFilled, AudioMutedOutlined, AudioOutlined} from "@ant-design/icons";
-import formatSecondToTime from "../utils/formatSecondToTime";
-import repeatOff from "../component/icon/repeat-off.png";
-import repeatTrack from "../component/icon/repeat-track.png";
-import repeatOne from "../component/icon/repeat-one.png";
 import back from "../component/icon/back.png";
-import pause from "../component/icon/pause.png";
-import play from "../component/icon/play-button-arrowhead.png";
 import next from "../component/icon/next.png";
 import toCamelCase from "../utils/toCamelCase";
 import toLowerCamelCase from "../utils/toLowerCamelCase";
 
 export default function Speaking() {
 
-    const { slug } = useParams();
+    const {slug} = useParams();
     const navigate = useNavigate();
     const location = useLocation();
     const index = location?.state?.index;
@@ -50,23 +39,23 @@ export default function Speaking() {
     } = useSpeechRecognition();
 
     const convertString = (track) => {
-        if( track ) {
-            const data = track.split('\n').map(el => el.slice(el.indexOf(']')+1));
+        if (track) {
+            const data = track.split('\n').map(el => el.slice(el.indexOf(']') + 1));
             const dataNew = [];
-            for(let i = 0; i < data.length; i++) {
-                    dataNew.push(data[i]);
+            for (let i = 0; i < data.length; i++) {
+                dataNew.push(data[i]);
             }
             setArrayMain(dataNew);
         }
     }
 
-    const clickMic = async(i) => {
+    const clickMic = async (i) => {
         setIndexLyric(i);
         setRecordingIndex(i);
         await SpeechRecognition.startListening();
     }
 
-    const stopMic = async() => {
+    const stopMic = async () => {
         setRecordingIndex(-1);
         await SpeechRecognition.stopListening();
     }
@@ -115,7 +104,7 @@ export default function Speaking() {
             await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlug/` + slug)
                 .then(response => setdataLesson(response.data[0]));
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     }
     const getRecords = async () => {
@@ -131,7 +120,7 @@ export default function Speaking() {
                     setRecords(response.data);
                 });
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     }
 
@@ -155,7 +144,7 @@ export default function Speaking() {
         containerElement.scrollTop = containerElement.scrollHeight;
     }, [containerRef]);
 
-    useEffect( () => {
+    useEffect(() => {
         lesson();
         if (cookies?.user) {
             getRecords();
@@ -164,12 +153,12 @@ export default function Speaking() {
     }, []);
 
     useEffect(() => {
-        if(!listening) {
+        if (!listening) {
             setRecordingIndex(-1);
             if (recordingAll && indexLyric < arrayMain.length - 1) {
                 if (transcript !== '') {
                     handleRecord(transcript);
-                    setTimeout(() => clickMic(indexLyric+1).then(), [1000]);
+                    setTimeout(() => clickMic(indexLyric + 1).then(), [1000]);
                 } else {
                     setIsModalSpeakOpen(true)
                 }
@@ -223,7 +212,7 @@ export default function Speaking() {
                         title: <a href="/topic">Topic</a>,
                     },
                     {
-                        title: <a href={"/lesson/" + dataLesson?.topic_slug}>{dataLesson?.topic_title}</a>,
+                        title: <a href={"/lesson/" + dataLesson?.course_slug}>{dataLesson?.course_title}</a>,
                     },
                     {
                         title: dataLesson?.title,
@@ -235,53 +224,58 @@ export default function Speaking() {
                 className="my-[20px]"
                 options={options}
                 value={story}
-                onChange={(e)=>setStory(e)}
-                block />
-                    <div className="bg-red-100 h-screen overflow-y-scroll" ref={containerRef}>
-                            {arrayMain.map((e,i) => (
-                                <div key={i} className="border-b border-black p-4 w-full">
-                                    <button className="w-full" onClick={() => setIndexLyric(i)}>
-                                        <div className="flex flex-row justify-between">
-                                            <div className="flex flex-row">
-                                                {e.split(' ').map(el => (<p className="font-bold text-xl" style={{
-                                                    color: recordMain.find(rec => +rec.position === i)?.text
-                                                        ? recordingIndex === i
-                                                            ? 'orange'
-                                                            : recordMain
-                                                                .find(rec => +rec.position === i)
-                                                                ?.text.replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
-                                                                .toLowerCase()
-                                                                .split(' ')
-                                                                .includes(
-                                                                    el
-                                                                        .replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
-                                                                        .toLowerCase(),
-                                                                )
-                                                                ? 'green'
-                                                                : 'red'
-                                                        : indexLyric === i
-                                                            ? 'orange'
-                                                            : 'black',
-                                                }}>{el}&nbsp;</p>))}
-                                            </div>
-                                            <button disabled={recordingIndex > -1 && recordingIndex !== i} onClick={recordingIndex === -1 ? () => clickMic(i) : stopMic }>{recordingIndex > -1 && recordingIndex !== i ? <AudioMutedOutlined /> : <AudioOutlined style={{ color: recordingIndex === i ? 'red' : null}} />}</button>
-                                        </div>
-                                        {i === indexLyric && (
-                                            <p className="w-full text-blue-500 font-bold text-xl text-left">{recordMain.find(rec => +rec.position === i)?.text}</p>
-                                            // <p className="w-full text-green-600 font-bold text-xl text-left">{transcript}</p>
-                                        )}
-                                    </button>
+                onChange={(e) => setStory(e)}
+                block/>
+            <div className="bg-red-100 h-screen overflow-y-scroll p-10" ref={containerRef}>
+                {arrayMain.map((e, i) => (
+                    <div key={i} className="py-1 w-full">
+                        <button className="w-full" onClick={() => setIndexLyric(i)}>
+                            <div className="flex flex-row justify-between">
+                                <div className="flex flex-row">
+                                    {e.split(' ').map(el => (<p className="font-bold text-xl" style={{
+                                        color: recordMain.find(rec => +rec.position === i)?.text
+                                            ? recordingIndex === i
+                                                ? 'orange'
+                                                : recordMain
+                                                    .find(rec => +rec.position === i)
+                                                    ?.text.replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
+                                                    .toLowerCase()
+                                                    .split(' ')
+                                                    .includes(
+                                                        el
+                                                            .replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
+                                                            .toLowerCase(),
+                                                    )
+                                                    ? 'green'
+                                                    : 'red'
+                                            : indexLyric === i
+                                                ? 'orange'
+                                                : 'black',
+                                    }}>{el}&nbsp;</p>))}
                                 </div>
-                            ))}
+                                <button disabled={recordingIndex > -1 && recordingIndex !== i}
+                                        onClick={recordingIndex === -1 ? () => clickMic(i) : stopMic}>{recordingIndex > -1 && recordingIndex !== i ?
+                                    <AudioMutedOutlined/> :
+                                    <AudioOutlined style={{color: recordingIndex === i ? 'red' : null}}/>}</button>
+                            </div>
+                            {i === indexLyric && (
+                                <p className="w-full text-blue-500 font-bold text-xl text-left">{recordMain.find(rec => +rec.position === i)?.text}</p>
+                                // <p className="w-full text-green-600 font-bold text-xl text-left">{transcript}</p>
+                            )}
+                        </button>
                     </div>
-                <div>
-                    <center>
-                        <div className='p-4 bg-gradient-to-r from-red-500 to-red-800 flex flex-row justify-center'>
-                            <button type="button" className='mx-5 rounded-full p-4' onClick={() => indexLyric > 0 && setIndexLyric( indexLyric-1)}>
-                                <img src={back} className='w-10 h-10'/>
-                            </button>
-                                <button type="button" className='mx-5 rounded-full p-4' style={{backgroundColor: listening ? "#EA580C" : '#60A5FA'}}
-                                        onClick={() => {
+                ))}
+            </div>
+            <div>
+                <center>
+                    <div className='p-4 bg-gradient-to-r from-red-500 to-red-800 flex flex-row justify-center'>
+                        <button type="button" className='mx-5 rounded-full p-4'
+                                onClick={() => indexLyric > 0 && setIndexLyric(indexLyric - 1)}>
+                            <img src={back} className='w-10 h-10'/>
+                        </button>
+                        <button type="button" className='mx-5 rounded-full p-4'
+                                style={{backgroundColor: listening ? "#EA580C" : '#60A5FA'}}
+                                onClick={() => {
                                     if (!listening) {
                                         setRecordingAll(true);
                                         clickMic(indexLyric).then();
@@ -290,18 +284,19 @@ export default function Speaking() {
                                         SpeechRecognition.stopListening().then();
                                     }
                                 }}>
-                                    <AudioFilled style={{ fontSize: 30}} className='w-10 h-10 justify-center text-white'/>
-                                </button>
-                            <button type="button" className='mx-5 rounded-full p-4' onClick={() => indexLyric < arrayMain.length-1 && setIndexLyric(indexLyric+1)}>
-                                <img src={next} className='w-10 h-10'/>
-                            </button>
-                        </div>
-                    </center>
-                </div>
-            <Modal open={isModalSpeakOpen} onOk={()=> {
+                            <AudioFilled style={{fontSize: 30}} className='w-10 h-10 justify-center text-white'/>
+                        </button>
+                        <button type="button" className='mx-5 rounded-full p-4'
+                                onClick={() => indexLyric < arrayMain.length - 1 && setIndexLyric(indexLyric + 1)}>
+                            <img src={next} className='w-10 h-10'/>
+                        </button>
+                    </div>
+                </center>
+            </div>
+            <Modal open={isModalSpeakOpen} onOk={() => {
                 setIsModalSpeakOpen(false)
                 clickMic(indexLyric)
-            }} onCancel={()=>setIsModalSpeakOpen(false)} okButtonProps={{ className: "bg-blue-500" }}>
+            }} onCancel={() => setIsModalSpeakOpen(false)} okButtonProps={{className: "bg-blue-500"}}>
                 <p className="text-xl font-bold py-5 pt-8">Bạn có muốn tiếp tục không?</p>
             </Modal>
         </div>
