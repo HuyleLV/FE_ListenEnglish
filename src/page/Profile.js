@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Col, Form, Image, Input, message, Modal, Pagination, Progress, Row, Select, Space, Table} from "antd";
+import {Button, Col, Form, Image, Input, message, Modal, Pagination, Row, Select, Space, Table} from "antd";
 import {useCookies} from "react-cookie";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -416,7 +416,7 @@ export default function Profile() {
                     >
                         <p className="font-bold py-5 text-center text-xl">Thời gian học</p>
 
-                        <Progress className="flex justify-center py-5 font-bold" type="circle" percent={66}/>
+                        {/*<Progress className="flex justify-center py-5 font-bold" type="circle" percent={66}/>*/}
                         <Row className="text-center">
                             <Col
                                 xs={24} xl={6}

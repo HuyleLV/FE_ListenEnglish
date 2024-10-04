@@ -1,22 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import useTimer from "../component/UseTimer";
-import { Lrc, LrcLine, useRecoverAutoScrollImmediately } from "react-lrc";
+import {Lrc, useRecoverAutoScrollImmediately} from "react-lrc";
 import Control from "../component/Control";
-import { songsdata } from "../component/audio";
+import {songsdata} from "../component/audio";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import Footer from "../component/Footer";
-import { Breadcrumb, Col, List, Row } from "antd";
+import {Breadcrumb, List, Segmented} from "antd";
 import parse from "html-react-parser";
-import { useDevice } from "../hooks/useDevice";
-import { useCookies } from "react-cookie";
-import { Segmented } from 'antd';
+import {useDevice} from "../hooks/useDevice";
+import {useCookies} from "react-cookie";
 import toCamelCase from "../utils/toCamelCase";
+import findMillisecond from "../utils/findMillisecond";
+import convertTimeToMilliseconds from "../utils/convertTimeToMilliseconds";
 
 export default function PlaylistDetail() {
 
-    const { id } = useParams();
-    const { isMobile } = useDevice();
+    const {id} = useParams();
+    const {isMobile} = useDevice();
     const location = useLocation();
     const index = location?.state?.index;
 
@@ -34,19 +35,24 @@ export default function PlaylistDetail() {
     const [news, setdataNews] = useState([]);
     const [options, setOptions] = useState([]);
     const [dataLessonPlaylist, setdataLessonPlaylist] = useState([]);
+    const [timestamps, setTimestamps] = useState([]);
+    const [current, setCurrent] = useState(0);
+    const [count, setCount] = useState(1);
+    const [scheduleDuration, setScheduleDuration] = useState(0);
+    const [scheduleId, setScheduleId] = useState();
+    const [loop, setLoop] = useState(0);
+    const [next, setNext] = useState(0);
 
     const [pagination, setPagination] = useState({
         page: 1,
         pageSize: 4,
-      });
+    });
     const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
     const {
         currentMillisecond,
         setCurrentMillisecond,
         reset,
-        play,
-        pause
     } = useTimer(200);
 
     const {
@@ -59,26 +65,28 @@ export default function PlaylistDetail() {
         const ct = audioElem.current.currentTime;
         setcurrentTime(ct * 1000);
 
-        setCurrentSong({ ...currentSong, "progress": ct / duration * 100, "length": duration });
+        setCurrentSong({...currentSong, "progress": ct / duration * 100, "length": duration});
     }
 
     const getNews = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getAll`, {params: pagination});
-          setdataNews(response?.data);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getAll`, {params: pagination});
+            setdataNews(response?.data);
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     }
 
     const lessonPlaylist = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/lessonplaylist/playlist/${id}`,
-                {params: pagination, headers: {
+                {
+                    params: pagination, headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${cookies?.user?.token}`
-                    }});
+                    }
+                });
             setdataLessonPlaylist(response?.data.data);
         } catch (error) {
             console.error(error);
@@ -97,20 +105,9 @@ export default function PlaylistDetail() {
         }
     };
 
-    const changeSpeedMode = () => {
-        const playbackRate = audioElem.current?.playbackRate;
-        if (speedMode !== 2 && playbackRate !== undefined) {
-            if (playbackRate === 0.5) {
-                setSpeedMode(speedMode+0.5);
-                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.5;
-            } else {
-                setSpeedMode(speedMode+0.25);
-                audioElem.current.playbackRate = audioElem.current.playbackRate + 0.25;
-            }
-        } else if (playbackRate !== undefined) {
-            setSpeedMode(0.5);
-            audioElem.current.playbackRate = 0.5;
-        }
+    const changeSpeedMode = (speed) => {
+        setSpeedMode(speed);
+        audioElem.current.playbackRate = speed;
     };
 
     const changeSoundMode = async () => {
@@ -130,11 +127,88 @@ export default function PlaylistDetail() {
     };
 
     const handleEnded = () => {
-        if(repeatMode === 'track') {
-            setSegment(options[story+1]);
-            setStory(story+1);
-        };
+        if (repeatMode === 'track') {
+            setSegment(options[story + 1]);
+            setStory(story + 1);
+        }
+
     }
+
+    const addTimestamps = async () => {
+        const temp = dataLessonPlaylist.map(el =>
+            el.text.split('\n')
+                .map(el => convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))))
+        )
+        setTimestamps(temp);
+    };
+
+    const play = () => {
+        try {
+            audioElem.current.play();
+            setisPlaying(true);
+        } catch (e) {
+            console.log(e)
+        }
+    };
+    const pause = () => {
+        try {
+            audioElem.current.play().then(() => {
+                audioElem.current.pause();
+                setisPlaying(false);
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const seekToNext = async () => {
+        const {nextTime} = findMillisecond(
+            timestamps[story],
+            audioElem.current?.currentTime * 1000 || 0,
+        );
+        audioElem.current.currentTime = nextTime / 1000;
+        setCurrent(nextTime);
+        setCount(1);
+    };
+
+    const seekToBack = async () => {
+        try {
+            const {previousTime} = findMillisecond(
+                timestamps[story],
+                audioElem.current?.currentTime * 1000 || 0,
+            );
+            console.log(previousTime);
+            audioElem.current.currentTime = previousTime / 1000;
+            setCurrent(previousTime);
+            setNext(currentTime);
+            setCount(1);
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const scheduleTurnOff = timeout => {
+        const timeoutId = setTimeout(async () => {
+            audioElem.current.pause();
+            setisPlaying(false);
+            setScheduleDuration(0);
+        }, timeout * 60 * 1000);
+        setScheduleId(timeoutId);
+    };
+
+    const clearScheduleTurnOff = () => {
+        scheduleId && clearTimeout(scheduleId);
+        setScheduleDuration(0);
+    };
+
+    const handleSchedulePress = timer => {
+        if (timer !== 0) {
+            scheduleTurnOff(timer);
+        } else {
+            clearScheduleTurnOff();
+        }
+        play();
+    };
 
     // useEffect(() => {
     //     if (isPlaying) {
@@ -150,9 +224,10 @@ export default function PlaylistDetail() {
     }, []);
 
     useEffect(() => {
-        if (dataLessonPlaylist.length > 0 ) {
+        if (dataLessonPlaylist.length > 0) {
+            addTimestamps();
             const option = [];
-            dataLessonPlaylist.forEach(el => option.push(el.title + ' - ' + toCamelCase( el.track)))
+            dataLessonPlaylist.forEach(el => option.push(el.title + ' - ' + toCamelCase(el.track)))
             setOptions(option);
             // setSegment(option[index] || "")
             setSegment(option[+index] || "")
@@ -160,13 +235,46 @@ export default function PlaylistDetail() {
         }
     }, [dataLessonPlaylist]);
 
-    // useEffect(() => {
-    //     if (isPlaying) {
-    //         audioElem.current.play();
-    //         // setisPlaying(true);
-    //     }
-    // }, [story])
+    useEffect(() => {
+        console.log(loop)
+        if (loop > 0 && !audioElem.current.paused) {
+            if (next === 0) {
+                const {currentTime, nextTime} = findMillisecond(
+                    timestamps[story],
+                    audioElem.current?.currentTime * 1000 || 0,
+                );
+                console.log(currentTime, nextTime)
+                setCurrent(currentTime);
+                setNext(nextTime);
+                console.log('next===0', current, next);
+            } else {
+                console.log('next!==0', current, next);
+                console.log(audioElem.current?.currentTime * 1000 + 200 > next)
+                console.log(count === loop || current === next)
+                if (audioElem.current?.currentTime * 1000 + 200 > next) {
+                    if (count === loop || current === next) {
+                        const {currentTime, nextTime} = findMillisecond(
+                            timestamps[story],
+                            audioElem.current?.currentTime * 1000 + 200,
+                        );
+                        setCurrent(currentTime);
+                        setNext(nextTime);
+                        setCount(1);
+                        console.log('new next', currentTime, nextTime);
 
+                        console.log('cleared');
+                    } else {
+
+                        audioElem.current.currentTime = current / 1000;
+                        setCount(count + 1);
+                    }
+                }
+            }
+        }
+    }, [audioElem.current?.currentTime]);
+    const openModal = () => {
+
+    }
 
     return (
         <>
@@ -189,12 +297,12 @@ export default function PlaylistDetail() {
                     className="my-[20px]"
                     options={options}
                     value={segment}
-                    onChange={(e)=> {
+                    onChange={(e) => {
                         setStory(options.indexOf(e));
                         setSegment(e);
                         setisPlaying(false);
                     }}
-                    block />
+                    block/>
                 <div>
                     <audio
                         src={dataLessonPlaylist[story]?.audio}
@@ -203,33 +311,37 @@ export default function PlaylistDetail() {
                         onTimeUpdate={onPlaying}
                         onEnded={handleEnded}
                     />
-                    { dataLessonPlaylist[story]?.text &&
-                            <Lrc
-                                className="bg-red-100 p-10 h-screen"
-                                lineRenderer={({ active, line: { content } }) =>
-                                    (
-                                        active ?
-                                            <>
-                                                <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
-                                            </>
-                                            : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
-                                    )
+                    {dataLessonPlaylist[story]?.text &&
+                        <Lrc
+                            className="bg-red-100 p-10 h-screen"
+                            lineRenderer={({active, line: {content}}) =>
+                                (
+                                    active ?
+                                        <>
+                                            <p active={active} className="text-orange-500 font-bold text-xl">{content}</p>
+                                        </>
+                                        : <p active={active} className="text-neutral-900 font-semibold text-xl">{content}</p>
+                                )
 
-                                }
-                                currentMillisecond={currentTime}
-                                // verticalSpace
-                                recoverAutoScrollSingal={signal}
-                                recoverAutoScrollInterval={5000}
-                                lrc={dataLessonPlaylist[story]?.text}
-                            />
+                            }
+                            currentMillisecond={currentTime}
+                            // verticalSpace
+                            recoverAutoScrollSingal={signal}
+                            recoverAutoScrollInterval={5000}
+                            lrc={dataLessonPlaylist[story]?.text}
+                        />
                     }
                     <Control
                         onPlay={play}
                         onPause={pause}
+                        onSeekToNext={seekToNext}
+                        onSeekToBack={seekToBack}
+                        onScheduleTimeOff={handleSchedulePress}
+                        onLoop={setLoop}
+                        loopValue={loop}
                         onReset={reset}
                         current={currentTime}
                         setCurrent={setcurrentTime}
-                        changeRepeatMode={changeRepeatMode}
                         recoverAutoScrollImmediately={recoverAutoScrollImmediately}
                         isPlaying={isPlaying}
                         setisPlaying={setisPlaying}
@@ -241,7 +353,9 @@ export default function PlaylistDetail() {
                         repeatMode={repeatMode}
                         changeSpeedMode={changeSpeedMode}
                         changeSoundMode={changeSoundMode}
-                        isPlaylist={true}
+                        speed={speedMode}
+                        isPlaylist={false}
+                        openModal={openModal}
                     />
                 </div>
                 <div className="py-10">

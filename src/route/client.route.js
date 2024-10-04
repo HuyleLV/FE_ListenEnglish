@@ -15,6 +15,7 @@ import Playlist from "../page/Playlist";
 import LessonPlaylist from "../page/LessonPlaylist";
 import PlaylistDetail from "../page/PlaylistDetail";
 import Course from "../page/Course";
+import Listening from "../page/Listening";
 
 export const Client = () => {
     return (
@@ -32,6 +33,7 @@ export const Client = () => {
             <Route path="/lesson/:slug" element={<Lesson/>}/>
             <Route path="/lesson/detail/:slug" element={<LessonDetail/>}/>
             <Route path="/lesson/speaking/:slug" element={<Speaking/>}/>
+            <Route path="/lesson/listening/:slug" element={<Listening/>}/>
             <Route path="/profile/:user_id" element={<Profile/>}/>
             <Route path="/loginAdmin" element={<LoginAdmin/>}/>
             <Route path="/login" element={<Login/>}/>

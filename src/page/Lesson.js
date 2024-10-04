@@ -66,7 +66,7 @@ export default function Lesson() {
                                     <p className="pt-[10px] font-semibold text-xl">{lesson.id + ". " + lesson.title}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2">
+                            <div className="grid grid-cols-3">
                                 {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
                                 && cookies?.user?.vip_expire_at !== null
                                 || +dataUserTopic?.lesson_id >= +lesson.id || +index === 0
@@ -75,6 +75,11 @@ export default function Lesson() {
                                         <Link to={"/lesson/detail/" + lesson?.slug} state={{index: index}}>
                                             <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
                                                 Audio
+                                            </div>
+                                        </Link>
+                                        <Link to={"/lesson/listening/" + lesson?.slug} state={{index: index}}>
+                                            <div className="col-span-1 bg-orange-500 p-2 font-bold">
+                                                Listening
                                             </div>
                                         </Link>
                                         <Link to={"/lesson/speaking/" + lesson?.slug} state={{index: index}}>

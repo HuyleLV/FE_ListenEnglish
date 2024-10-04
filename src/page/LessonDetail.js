@@ -13,6 +13,8 @@ import {useCookies} from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
 import toLowerCamelCase from "../utils/toLowerCamelCase";
 import ReactPlayer from "react-player";
+import convertTimeToMilliseconds from "../utils/convertTimeToMilliseconds";
+import findMillisecond from "../utils/findMillisecond";
 
 export default function LessonDetail() {
     const {slug} = useParams();
@@ -38,6 +40,14 @@ export default function LessonDetail() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dataUserTopic, setDataUserTopic] = useState({});
     const [speedFlag, setSpeedFlag] = useState(false);
+    const [timestamps, setTimestamps] = useState({});
+    const [current, setCurrent] = useState(0);
+    const [count, setCount] = useState(1);
+    const [scheduleDuration, setScheduleDuration] = useState(0);
+    const [scheduleId, setScheduleId] = useState();
+    const [loop, setLoop] = useState(0);
+    const [next, setNext] = useState(0);
+
 
     const [pagination, setPagination] = useState({
         page: 1,
@@ -49,8 +59,6 @@ export default function LessonDetail() {
         currentMillisecond,
         setCurrentMillisecond,
         reset,
-        play,
-        pause
     } = useTimer(200);
 
     const {
@@ -68,6 +76,82 @@ export default function LessonDetail() {
         setCurrentSong({...currentSong, "progress": ct / duration * 100, "length": duration});
     }
 
+    const addTimestamps = async () => {
+        const temp = {};
+        if (dataLesson?.mainStory) {
+            temp.mainStory = await dataLesson.mainStory
+                .split('\n')
+                .map(el => convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))));
+        }
+        if (dataLesson?.miniStory) {
+            temp.miniStory = await dataLesson.miniStory
+                .split('\n')
+                .map(el => convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))));
+        }
+        if (dataLesson?.POV) {
+            temp.pOV = await dataLesson.POV.split('\n').map(el =>
+                convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))),
+            );
+        }
+        if (dataLesson?.comment) {
+            temp.comment = await dataLesson.comment
+                .split('\n')
+                .map(el => convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))));
+        }
+        if (dataLesson?.vocabulary) {
+            temp.vocabulary = await dataLesson.vocabulary
+                .split('\n')
+                .map(el => convertTimeToMilliseconds(el.slice(1, el.indexOf(']'))));
+        }
+        setTimestamps(temp);
+    };
+
+    const play = () => {
+        try {
+            audioElem.current.play();
+            setisPlaying(true);
+        } catch (e) {
+            console.log(e)
+        }
+    };
+    const pause = () => {
+        try {
+            audioElem.current.play().then(() => {
+                audioElem.current.pause();
+                setisPlaying(false);
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    };
+
+    const seekToNext = async () => {
+        const {nextTime} = findMillisecond(
+            timestamps[toLowerCamelCase(story)],
+            audioElem.current?.currentTime * 1000 || 0,
+        );
+        audioElem.current.currentTime = nextTime / 1000;
+        videoPlayerRef?.current?.seekTo(nextTime / 1000);
+        setCurrent(nextTime);
+        setCount(1);
+    };
+
+    const seekToBack = async () => {
+        try {
+            const {previousTime} = findMillisecond(
+                timestamps[toLowerCamelCase(story)],
+                audioElem.current?.currentTime * 1000 || 0,
+            );
+            console.log(previousTime);
+            audioElem.current.currentTime = previousTime / 1000;
+            videoPlayerRef?.current?.seekTo(previousTime / 1000);
+            setCurrent(previousTime);
+            setNext(currentTime);
+            setCount(1);
+        } catch (e) {
+            console.log(e)
+        }
+    };
     const getNews = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/blog/getAll`, {params: pagination});
@@ -133,18 +217,9 @@ export default function LessonDetail() {
         }
     };
 
-    const changeSpeedMode = () => {
-        const playbackRate = audioElem.current?.playbackRate;
-        if (playbackRate) {
-            if (!speedFlag || speedMode === 2) {
-                setSpeedFlag(true);
-                setSpeedMode(0.5);
-                audioElem.current.playbackRate = 0.5;
-            } else {
-                audioElem.current.playbackRate = speedMode + 0.25;
-                setSpeedMode(speedMode + 0.25);
-            }
-        }
+    const changeSpeedMode = (speed) => {
+        setSpeedMode(speed);
+        audioElem.current.playbackRate = speed;
     };
 
     const changeSoundMode = async () => {
@@ -196,6 +271,29 @@ export default function LessonDetail() {
             })
     }
 
+    const scheduleTurnOff = timeout => {
+        const timeoutId = setTimeout(async () => {
+            audioElem.current.pause();
+            setisPlaying(false);
+            setScheduleDuration(0);
+        }, timeout * 60 * 1000);
+        setScheduleId(timeoutId);
+    };
+
+    const clearScheduleTurnOff = () => {
+        scheduleId && clearTimeout(scheduleId);
+        setScheduleDuration(0);
+    };
+
+    const handleSchedulePress = timer => {
+        if (timer !== 0) {
+            scheduleTurnOff(timer);
+        } else {
+            clearScheduleTurnOff();
+        }
+        play();
+    };
+
     useEffect(() => {
         lesson();
         getNews();
@@ -217,6 +315,7 @@ export default function LessonDetail() {
     }, [story])
 
     useEffect(() => {
+        addTimestamps();
         const options = [];
         if (dataLesson?.mainStory) options.push('Main Story');
         if (dataLesson?.vocabulary) options.push('Vocabulary');
@@ -225,6 +324,45 @@ export default function LessonDetail() {
         if (dataLesson?.comment) options.push('Comment');
         setOptions(options);
     }, [dataLesson])
+
+    useEffect(() => {
+        console.log(loop)
+        if (loop > 0 && !audioElem.current.paused) {
+            if (next === 0) {
+                const {currentTime, nextTime} = findMillisecond(
+                    timestamps[toLowerCamelCase(story)],
+                    audioElem.current?.currentTime * 1000 || 0,
+                );
+                console.log(currentTime, nextTime)
+                setCurrent(currentTime);
+                setNext(nextTime);
+                console.log('next===0', current, next);
+            } else {
+                console.log('next!==0', current, next);
+                console.log(audioElem.current?.currentTime * 1000 + 200 > next)
+                console.log(count === loop || current === next)
+                if (audioElem.current?.currentTime * 1000 + 200 > next) {
+                    if (count === loop || current === next) {
+                        const {currentTime, nextTime} = findMillisecond(
+                            timestamps[toLowerCamelCase(story)],
+                            audioElem.current?.currentTime * 1000 + 200,
+                        );
+                        setCurrent(currentTime);
+                        setNext(nextTime);
+                        setCount(1);
+                        console.log('new next', currentTime, nextTime);
+
+                        console.log('cleared');
+                    } else {
+
+                        videoPlayerRef?.current?.seekTo(current / 1000);
+                        audioElem.current.currentTime = current / 1000;
+                        setCount(count + 1);
+                    }
+                }
+            }
+        }
+    }, [audioElem.current?.currentTime]);
 
     useEffect(() => {
         if (dataUserTopic?.lesson_id) {
@@ -368,10 +506,14 @@ export default function LessonDetail() {
                     <Control
                         onPlay={play}
                         onPause={pause}
+                        onSeekToNext={seekToNext}
+                        onSeekToBack={seekToBack}
+                        onScheduleTimeOff={handleSchedulePress}
+                        onLoop={setLoop}
+                        loopValue={loop}
                         onReset={reset}
                         current={currentTime}
                         setCurrent={setcurrentTime}
-                        changeRepeatMode={changeRepeatMode}
                         recoverAutoScrollImmediately={recoverAutoScrollImmediately}
                         isPlaying={isPlaying}
                         setisPlaying={setisPlaying}
@@ -383,6 +525,7 @@ export default function LessonDetail() {
                         repeatMode={repeatMode}
                         changeSpeedMode={changeSpeedMode}
                         changeSoundMode={changeSoundMode}
+                        speed={speedMode}
                         isPlaylist={false}
                         openModal={openModal}
                         videoPlayerRef={videoPlayerRef}
