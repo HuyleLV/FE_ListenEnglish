@@ -1,8 +1,7 @@
 import axios from "axios";
-import cd from "../component/icon/cd.png"
 import {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Modal, Pagination} from "antd";
+import {Col, Modal, Pagination, Row} from "antd";
 import Footer from "../component/Footer";
 import {useCookies} from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
@@ -25,6 +24,7 @@ export default function Lesson() {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/lesson/getBySlugCourse/${slug}`, {params: pagination});
             setdataLesson(response?.data[0]);
+            console.log(response.data[0]);
         } catch (error) {
             console.error(error);
         }
@@ -54,58 +54,57 @@ export default function Lesson() {
         <>
             <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
                 <p className="text-4xl text-center py-10">{dataLesson?.title}</p>
+                <Row className="pt-[40px]">
 
-                <div class="grid grid-cols-4 gap-4 text-center pt-[40px] text-white h-full">
                     {dataLesson?.lesson?.map((lesson, index) =>
-                        <div class="col-span-1 text-center pt-[40px] text-white" key={index}>
-                            <div class="bg-gradient-to-r from-red-500 to-red-800 rounded-t-md">
-                                <div className="p-5">
-                                    <center>
-                                        <img src={cd} className="h-20 w-20"/>
-                                    </center>
-                                    <p className="pt-[10px] font-semibold text-xl">{lesson.id + ". " + lesson.title}</p>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-3">
-                                {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
-                                && cookies?.user?.vip_expire_at !== null
-                                || +dataUserTopic?.lesson_id >= +lesson.id || +index === 0
-                                    ?
-                                    <>
+                        <Col xs={24} xl={6} key={index}>
+                            {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
+                            && cookies?.user?.vip_expire_at !== null
+                            || +dataUserTopic?.lesson_id >= +lesson.id || +index === 0
+                                ?
+                                <div className="rounded border m-2 p-2 flex">
+                                    <div className="rounded border p-1">
+                                        <img src={lesson?.lesson_url} width={48}/>
+                                    </div>
+                                    <div className="ml-2 flex flex-col justify-around">
                                         <Link to={"/lesson/detail/" + lesson?.slug} state={{index: index}}>
-                                            <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
-                                                Audio
-                                            </div>
+                                            <p className="font-semibold text-blue-700">{lesson.title}</p>
                                         </Link>
-                                        <Link to={"/lesson/listening/" + lesson?.slug} state={{index: index}}>
-                                            <div className="col-span-1 bg-orange-500 p-2 font-bold">
-                                                Listening
-                                            </div>
-                                        </Link>
-                                        <Link to={"/lesson/speaking/" + lesson?.slug} state={{index: index}}>
-                                            <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
-                                                Speaking
-                                            </div>
-                                        </Link>
-                                    </>
-                                    :
-                                    <>
+                                        <div className='flex justify-between'>
+                                            <Link to={"/lesson/listening/" + lesson?.slug} state={{index: index}}>
+                                                <p className='text-xs'>Listening</p>
+                                            </Link>
+                                            <Link to={"/lesson/speaking/" + lesson?.slug} state={{index: index}}>
+                                                <p className='text-xs ml-2'>Speaking</p>
+                                            </Link>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                :
+                                <div className="rounded border m-2 p-2 flex">
+                                    <div className="rounded border p-1">
+                                        <img src={lesson?.lesson_url} width={48}/>
+                                    </div>
+                                    <div className="ml-2 flex flex-col justify-around">
                                         <Link onClick={() => setIsModalOpen(true)}>
-                                            <div className="col-span-1 bg-orange-400 p-2 rounded-bl-md font-bold">
-                                                Audio
-                                            </div>
+                                            <p className="font-semibold text-blue-700">{lesson.title}</p>
                                         </Link>
-                                        <Link onClick={() => setIsModalOpen(true)}>
-                                            <div className="col-span-1 bg-orange-600 p-2 rounded-br-md font-bold">
-                                                Speaking
-                                            </div>
-                                        </Link>
-                                    </>
-                                }
-                            </div>
-                        </div>
+                                        <div className='flex justify-between'>
+                                            <Link onClick={() => setIsModalOpen(true)}>
+                                                <p className='text-xs'>Listening</p>
+                                            </Link>
+                                            <Link onClick={() => setIsModalOpen(true)}>
+                                                <p className='text-xs ml-2'>Speaking</p>
+                                            </Link>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </Col>
                     )}
-                </div>
+                </Row>
 
                 <Pagination
                     className="flex justify-center pt-[50px]"

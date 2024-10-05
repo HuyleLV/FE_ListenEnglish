@@ -24,6 +24,7 @@ export default function Course() {
     const course = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/course/getBySlugTopic/${slug}`, {params: pagination});
+            console.log(response.data[0])
             setdataCourse(response?.data[0]);
         } catch (error) {
             console.error(error);
@@ -41,14 +42,21 @@ export default function Course() {
                 <p className="text-4xl text-center py-10">{dataCourse?.title}</p>
 
                 <Row
-                    className={isMobile ? 'text-center pt-[40px] text-white flex justify-center' : 'text-center pt-[40px] text-white'}>
+                    className='pt-[40px]'>
                     {dataCourse?.course?.map((course, index) =>
                         <Col xs={24} xl={6} key={index}>
-                            <Link to={"/lesson/" + course.slug}>
-                                <div className='bg-gradient-to-r from-red-500 to-red-800 rounded-xl m-2 p-10 h-[150px]'>
-                                    <p className="pt-[10px] font-semibold text-xl">{course.id + ". " + course.title}</p>
+                            <div className="rounded border m-2 p-2 flex">
+                                <div className="rounded border p-1">
+                                    <img src={course?.image_url} width={48}/>
                                 </div>
-                            </Link>
+                                <div className="ml-2 flex flex-col justify-around">
+                                    <Link to={"/lesson/" + course.slug}>
+                                        <p className="font-semibold text-blue-700">{course.title}</p>
+                                    </Link>
+                                    <p className="text-xs">{course.totalLessons} lessons</p>
+                                </div>
+
+                            </div>
                         </Col>
                     )}
                 </Row>

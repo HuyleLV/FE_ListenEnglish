@@ -13,6 +13,7 @@ import toLowerCamelCase from "../utils/toLowerCamelCase";
 import ControlListening from "../component/ControlListening";
 import {createUserListening, getUserListening} from "../apis/userListening";
 import {ModalListeningSetting} from "../component/Listening/Modal";
+import {Lrc} from "react-lrc";
 
 export default function Listening() {
 
@@ -411,6 +412,32 @@ export default function Listening() {
                 setTextInput={setTextInput}
                 setShowAnswer={setShowAnswer}
             />
+            <div className="bg-white drop-shadow mt-10 px-10 pb-10 flex flex-col items-center">
+                <audio
+                    controls
+                    className='mt-10'
+                    src={story === "Main Story"
+                        ? dataLesson?.mainStoryAudio
+                        : story === "Vocabulary"
+                            ? dataLesson?.vocabularyAudio
+                            : story === "Mini Story"
+                                ? dataLesson?.miniStoryAudio
+                                : null
+                    }
+                />
+                <div>
+                    <Lrc
+                        className="mt-10"
+                        lineRenderer={({active, line: {content}}) =>
+                            (
+                                <p>{content}</p>
+                            )
+
+                        }
+                        lrc={dataLesson[toLowerCamelCase(story)] || ''}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
