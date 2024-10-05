@@ -57,25 +57,25 @@ export default function Lesson() {
                 <Row className="pt-[40px]">
 
                     {dataLesson?.lesson?.map((lesson, index) =>
-                        <Col xs={24} xl={6} key={index}>
+                        <Col xs={24} xl={6} key={index} className='mt-5'>
                             {dayjsInstance(cookies?.user?.vip_expire_at)?.format("YYYY-MM-DD") > dayjsInstance(Date())?.format("YYYY-MM-DD")
                             && cookies?.user?.vip_expire_at !== null
                             || +dataUserTopic?.lesson_id >= +lesson.id || +index === 0
                                 ?
-                                <div className="rounded border m-2 p-2 flex">
+                                <div className='grid grid-cols-4 gap-2 rounded border m-2 p-2 bg-white flex items-center h-full'>
                                     <div className="rounded border p-1">
-                                        <img src={lesson?.lesson_url} width={48}/>
+                                        <img src={lesson?.lesson_url} width={60}/>
                                     </div>
-                                    <div className="ml-2 flex flex-col justify-around">
+                                    <div className="ml-2 col-span-3 text-lg">
                                         <Link to={"/lesson/detail/" + lesson?.slug} state={{index: index}}>
                                             <p className="font-semibold text-blue-700">{lesson.title}</p>
                                         </Link>
-                                        <div className='flex justify-between'>
+                                        <div className='flex font-semibold pt-1'>
                                             <Link to={"/lesson/listening/" + lesson?.slug} state={{index: index}}>
-                                                <p className='text-xs'>Listening</p>
+                                                <p className='text-xs border px-2 py-1 rounded hover:bg-blue-100'>Listening</p>
                                             </Link>
                                             <Link to={"/lesson/speaking/" + lesson?.slug} state={{index: index}}>
-                                                <p className='text-xs ml-2'>Speaking</p>
+                                                <p className='text-xs ml-4 border px-2 py-1 rounded hover:bg-blue-100'>Speaking</p>
                                             </Link>
                                         </div>
                                     </div>

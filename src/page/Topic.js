@@ -31,17 +31,16 @@ export default function Topic() {
         <>
             <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
                 <p className="text-4xl text-center py-10">Tất cả chương trình học</p>
-                <Row
-                    className='pt-[40px]'>
+                <Row className='pt-[30px]'>
                     {dataTopic?.data?.map((topic, index) =>
-                        <Col xs={24} xl={6} key={index}>
-                            <div className='rounded border m-2 p-2 flex'>
+                        <Col xs={24} xl={6} key={index} className='mt-5'>
+                            <div className='grid grid-cols-4 gap-2 rounded border m-2 p-2 bg-white flex items-center h-full'>
                                 <div className='rounded border p-1'>
-                                    <img src={topic.image_url} width={48}/>
+                                    <img src={topic.image_url} width={60}/>
                                 </div>
-                                <div className="ml-2 flex flex-col justify-around">
+                                <div className="ml-2 col-span-3">
                                     <Link to={"/course/" + topic.slug}>
-                                        <p className="font-semibold text-blue-700">{topic.title}</p>
+                                        <p className="text-lg font-semibold text-blue-700">{topic.title}</p>
                                     </Link>
                                     <p className='text-xs'>{topic.totalCourses} courses</p>
                                 </div>

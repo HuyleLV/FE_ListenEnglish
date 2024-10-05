@@ -42,16 +42,16 @@ export default function Course() {
                 <p className="text-4xl text-center py-10">{dataCourse?.title}</p>
 
                 <Row
-                    className='pt-[40px]'>
+                    className='pt-[30px]'>
                     {dataCourse?.course?.map((course, index) =>
-                        <Col xs={24} xl={6} key={index}>
-                            <div className="rounded border m-2 p-2 flex">
+                        <Col xs={24} xl={6} key={index} className='mt-5'>
+                            <div className='grid grid-cols-4 gap-2 rounded border m-2 p-2 bg-white flex items-center h-full'>
                                 <div className="rounded border p-1">
-                                    <img src={course?.image_url} width={48}/>
+                                    <img src={course?.image_url} width={60}/>
                                 </div>
-                                <div className="ml-2 flex flex-col justify-around">
+                                <div className="ml-2 flex flex-col justify-around col-span-3">
                                     <Link to={"/lesson/" + course.slug}>
-                                        <p className="font-semibold text-blue-700">{course.title}</p>
+                                        <p className="text-lg font-semibold text-blue-700">{course.title}</p>
                                     </Link>
                                     <p className="text-xs">{course.totalLessons} lessons</p>
                                 </div>
