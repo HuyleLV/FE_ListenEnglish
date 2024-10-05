@@ -1,4 +1,4 @@
-import {Col, Pagination, Row} from 'antd';
+import {Breadcrumb, Col, Pagination, Row} from 'antd';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
@@ -30,6 +30,17 @@ export default function Topic() {
     return (
         <>
             <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+                <Breadcrumb
+                    className="py-5"
+                    items={[
+                        {
+                            title: <a href="/">Home</a>,
+                        },
+                        {
+                            title: <a href="/topic">Topic</a>,
+                        }
+                    ]}
+                />
                 <p className="text-4xl text-center py-10">Tất cả chương trình học</p>
                 <Row className='pt-[30px]'>
                     {dataTopic?.data?.map((topic, index) =>

@@ -1,7 +1,7 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Col, Modal, Pagination, Row} from "antd";
+import {Breadcrumb, Col, Modal, Pagination, Row} from "antd";
 import Footer from "../component/Footer";
 import {useCookies} from "react-cookie";
 import {useDevice} from "../hooks";
@@ -39,6 +39,20 @@ export default function Course() {
     return (
         <>
             <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+                <Breadcrumb
+                    className="py-5"
+                    items={[
+                        {
+                            title: <a href="/">Home</a>,
+                        },
+                        {
+                            title: <a href="/topic">Topic</a>,
+                        },
+                        {
+                            title: dataCourse?.title,
+                        },
+                    ]}
+                />
                 <p className="text-4xl text-center py-10">{dataCourse?.title}</p>
 
                 <Row

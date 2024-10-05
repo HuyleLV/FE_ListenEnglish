@@ -424,13 +424,12 @@ export default function LessonDetail() {
                     />
                     <div
                         className='flex justify-center'>
-                        {dataLesson[toLowerCamelCase(story) + 'Video'] ?
+                        {dataLesson[toLowerCamelCase(story) + 'Video'] &&
                             <ReactPlayer url={dataLesson[toLowerCamelCase(story) + 'Video']}
                                          ref={videoPlayerRef}
                                          volume={0}
-                                         playing={isPlaying}/> :
-                            <img src={dataLesson?.lesson_url} width={640}
-                                 style={{objectFit: 'contain', height: 360}} alt={''}/>}
+                                         playing={isPlaying}/> 
+                        }
                     </div>
                     {dataLesson?.mainStory && story === "Main Story" ?
                         <>

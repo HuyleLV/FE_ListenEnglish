@@ -27,7 +27,7 @@ export default function Blog() {
 
     return (
         <>
-            <div class="max-w-screen-xl items-center mx-auto py-1 pb-[100px]">
+            <div class="max-w-screen-lg items-center mx-auto py-1 pb-[100px]">
                 <List
                     className='py-5 mx-2'
                     itemLayout="horizontal"
