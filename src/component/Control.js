@@ -10,6 +10,7 @@ import {useNavigate, useParams} from 'react-router-dom';
 import {useCookies} from 'react-cookie';
 import formatSecondToTime from "../utils/formatSecondToTime";
 import {Dropdown} from "antd";
+import {SPEED_MODE} from "../mocks";
 
 function Control({
                      onPlay,
@@ -98,7 +99,6 @@ function Control({
         },
     ];
 
-    const speedMode = [0.5, 0.75, 1, 1.25, 1.75, 2];
     const PlayPause = () => {
         try {
             if (isPlaying === true) {
@@ -170,7 +170,7 @@ function Control({
                         className='mx-5 h-auto rounded-full px-9 bg-orange-600 flex items-center cursor-pointer'
                         overlayStyle={{maxHeight: 400, overflow: 'auto'}}
                         menu={{
-                            items: speedMode.map((el, i) => {
+                            items: SPEED_MODE.map((el, i) => {
                                 return {
                                     label: (<div onClick={() => {
                                         changeSpeedMode(el);

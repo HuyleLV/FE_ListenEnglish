@@ -1,11 +1,14 @@
-import React from 'react';
-import play from "../component/icon/play-button-arrowhead.png"
-import pause from "../component/icon/pause.png"
-import next from "../component/icon/next.png"
-import back from "../component/icon/back.png"
+import React, {useEffect, useRef, useState} from 'react';
+import play from "../component/icon/play.svg"
+import pause from "../component/icon/pause.svg"
+import next from "../component/icon/next.svg"
+import back from "../component/icon/back.svg"
 import {Dropdown} from "antd";
+import {SPEED_MODE} from "../mocks";
+import findMillisecond from "../utils/findMillisecond";
 
-function ControlListening({onPlay, onPause, setIsPlaying, isPlaying, audioElem, changeSpeedMode, active, setActive, timestamp, setTextInput, setShowAnswer}) {
+function ControlListening({onPlay, onPause, setIsPlaying, isPlaying, audioElem, changeSpeedMode, speed, active, setActive, timestamp, setTextInput, setShowAnswer, data}) {
+    const [width, setWidth] = useState(0);
     const PlayPause = async () => {
         try {
             if (isPlaying === true) {
@@ -18,43 +21,49 @@ function ControlListening({onPlay, onPause, setIsPlaying, isPlaying, audioElem, 
             console.log(e)
         }
     }
+    const clickRef = useRef();
+
+    const checkWidth = (e) => {
+        try {
+            let width = clickRef.current.clientWidth;
+            const offset = e.nativeEvent.offsetX;
+
+            const divprogress = offset / width * 100; //30% duration 10s
+            const {currentTime, nextTime} = findMillisecond(
+                timestamp || [],
+                audioElem.current?.currentTime * 1000 || 0,
+            );
+            audioElem.current.currentTime = divprogress / 100 * (nextTime - currentTime) / 1000 + currentTime / 1000;
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    useEffect(() => {
+        const {currentTime, nextTime} = findMillisecond(
+            timestamp || [],
+            audioElem.current?.currentTime * 1000 || 0,
+        );
+        const progress = audioElem?.current ? (audioElem.current.currentTime - currentTime / 1000) / ((nextTime - currentTime) / 1000) * 100 : 0;
+        setWidth(progress);
+    }, [active, audioElem?.current?.currentTime])
+
 
     return (
         <div>
-            <center>
-                <div className='p-4 bg-gradient-to-r from-red-500 to-red-800 flex flex-row justify-center'>
-                    <button type="button" className='w-32 mx-5 h-auto px-9 items-center' onClick={changeSpeedMode}
-                    >
-                        <p className="w-0 text-xl font-semibold flex item-center text-center justify-center text-white">{audioElem.current?.playbackRate + 'X'}</p>
-                    </button>
-                    <button type="button" className='mx-5 rounded-full p-4'
+            <div>
+                <div className='flex'>
+                    <button type="button" className='p-4'
                             onClick={() => {
                                 setActive(active - 1 < 0 ? 0 : (active - 1) % (timestamp?.length || 0));
                                 setTextInput('');
                                 setShowAnswer(false);
                                 onPause();
                             }}>
-                        <img src={back} className='w-10 h-10'/>
-                    </button>
-                    {isPlaying ?
-                        <button type="button" className='mx-5 p-4' onClick={PlayPause}>
-                            <img src={pause} className='w-10 h-10'/>
-                        </button>
-                        :
-                        <button type="button" className='mx-5 p-4' onClick={PlayPause}>
-                            <img src={play} className='w-10 h-10'/>
-                        </button>
-                    }
-                    <button type="button" className='mx-5 rounded-full p-4' onClick={() => {
-                        setActive((active + 1) % (timestamp?.length || 0));
-                        setTextInput('');
-                        setShowAnswer(false);
-                        onPause();
-                    }}>
-                        <img src={next} className='w-10 h-10'/>
+                        <img src={back} className='w-5 h-5'/>
                     </button>
                     <Dropdown
-                        className='w-32 mx-5 px-9 flex items-center cursor-pointer'
+                        className='flex items-center cursor-pointer'
                         overlayStyle={{maxHeight: 400, overflow: 'auto'}}
                         menu={{
                             items: timestamp?.map((el, i) => {
@@ -73,12 +82,57 @@ function ControlListening({onPlay, onPause, setIsPlaying, isPlaying, audioElem, 
                             selectable: true,
                         }}
                     >
-                        <p className='text-white text-xl font-semibold'>
+                        <p className='text-xl font-semibold'>
                             {active + 1}/{timestamp?.length || 0}
                         </p>
                     </Dropdown>
+                    <button type="button" className='p-4' onClick={() => {
+                        setActive((active + 1) % (timestamp?.length || 0));
+                        setTextInput('');
+                        setShowAnswer(false);
+                        onPause();
+                    }}>
+                        <img src={next} className='w-5 h-5'/>
+                    </button>
                 </div>
-            </center>
+                <div className='flex justify-center'>
+                    <button type="button" className='mr-4' onClick={PlayPause}>
+                        <div className='p-4 rounded border'>
+                            <img src={isPlaying ? pause : play} className='w-3'/>
+                        </div>
+                    </button>
+                    <div className="w-64 flex px-2 items-center justify-center">
+                        <div className="w-full bg-gray-200 h-[6px] rounded-full cursor-pointer" onClick={checkWidth}
+                             ref={clickRef}>
+                            <div className="w-0 h-full bg-sky-600 rounded-[30px]"
+                                 style={{width: `${width + "%"}`}}></div>
+                        </div>
+                    </div>
+                    <Dropdown
+                        className='mx-5 flex items-center cursor-pointer'
+                        overlayStyle={{maxHeight: 400, overflow: 'auto'}}
+                        menu={{
+                            items: SPEED_MODE.map((el, i) => {
+                                return {
+                                    label: (<div onClick={() => {
+                                        changeSpeedMode(el);
+                                    }}>
+                                        {el}X
+                                    </div>),
+                                    key: i
+                                }
+                            }),
+                            selectable: true,
+                        }}
+                    >
+                        <div>
+                            <div className='py-2 px-4 rounded border'>
+                                <p className="text-xs">{speed + 'X'}</p>
+                            </div>
+                        </div>
+                    </Dropdown>
+                </div>
+            </div>
         </div>
     );
 }

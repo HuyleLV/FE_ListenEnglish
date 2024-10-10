@@ -10,10 +10,10 @@ import {AudioFilled, EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 import {songsdata} from "../component/audio";
 import convertTimeToMilliseconds from "../utils/convertTimeToMilliseconds";
 import toLowerCamelCase from "../utils/toLowerCamelCase";
-import ControlListening from "../component/ControlListening";
 import {createUserListening, getUserListening} from "../apis/userListening";
 import {ModalListeningSetting} from "../component/Listening/Modal";
 import {Lrc} from "react-lrc";
+import ControlListening from "../component/ControlListening";
 
 export default function Listening() {
 
@@ -179,18 +179,9 @@ export default function Listening() {
         setCurrentSong({...currentSong, "progress": ct / duration * 100, "length": duration});
     }
 
-    const changeSpeedMode = () => {
-        const playbackRate = audioElem.current?.playbackRate;
-        if (playbackRate) {
-            if (!speedFlag || speedMode === 2) {
-                setSpeedFlag(true);
-                setSpeedMode(0.5);
-                audioElem.current.playbackRate = 0.5;
-            } else {
-                audioElem.current.playbackRate = speedMode + 0.25;
-                setSpeedMode(speedMode + 0.25);
-            }
-        }
+    const changeSpeedMode = (speed) => {
+        setSpeedMode(speed);
+        audioElem.current.playbackRate = speed;
     };
 
     const addTimestamps = async () => {
@@ -295,7 +286,7 @@ export default function Listening() {
                 value={story}
                 onChange={(e) => handleChangeStory(e)}
                 block/>
-            <div className="bg-white drop-shadow px-10 pb-10 flex flex-col items-center">
+            <div className="bg-white drop-shadow px-10 pb-10 flex flex-col">
                 <audio
                     src={story === "Main Story"
                         ? dataLesson?.mainStoryAudio
@@ -308,21 +299,28 @@ export default function Listening() {
                     ref={audioElem}
                     onTimeUpdate={onPlaying}
                 />
-                <div className='w-full flex justify-end'>
-
+                <div className='w-full flex justify-between'>
+                    <ControlListening
+                        onPlay={play}
+                        onPause={pause}
+                        isPlaying={isPlaying}
+                        setIsPlaying={setisPlaying}
+                        audioElem={audioElem}
+                        changeSpeedMode={changeSpeedMode}
+                        speed={speedMode}
+                        active={active}
+                        setActive={setActive}
+                        timestamp={timestamps[toLowerCamelCase(story)]}
+                        setTextInput={setTextInput}
+                        setShowAnswer={setShowAnswer}
+                        data={dataLesson[toLowerCamelCase(story) + 'Audio']}
+                    />
                     <ModalListeningSetting replay={replay} timeReplay={timeReplay} setReplay={setReplay} setTimeReplay={setTimeReplay}/>
                 </div>
-                <div className='h-20'>
-                    {showAnswer && (
-                        <Progress className="flex justify-center font-bold" size={64} type="circle" percent={dataUserListening
-                            ?.filter(el => el.track === toLowerCamelCase(story))
-                            ?.find(el => el.position === active)?.point || 0}
-                        />
-                    )}
-                </div>
+
                 <Form
                     layout={"vertical"}
-                    className='w-1/2'
+                    className='w-1/2 mt-4'
                     colon={false}
                     form={form}
                     onFinishFailed={(e) => console.log(e)}
@@ -338,80 +336,64 @@ export default function Listening() {
                             iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
                         />
                     </Form.Item>
-                    <div className='h-32'>
-                        {showAnswer && (
-                            <>
-                                <p className="font-bold text-xl"
-                                   style={{color: 'green'}}>
-                                    {dataUserListening
-                                        ?.filter(el => el.track === toLowerCamelCase(story))
-                                        ?.find(el => el.position === active)?.text}
-                                </p>
-                                <div>
-                                    {lyric && lyric[active]?.split(' ')?.map((word, i) => {
-                                        return (
-                                            <span className="font-bold text-xl"
-                                                  key={i}
-                                                  style={{
-                                                      color: dataUserListening
-                                                          ?.filter(el => el.track === toLowerCamelCase(story))
-                                                          ?.find(lis => +lis.position === active)
-                                                          ?.text.replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
-                                                          .toLowerCase()
-                                                          .split(' ')
-                                                          .includes(
-                                                              word
-                                                                  .replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
-                                                                  .toLowerCase(),
-                                                          )
-                                                          ? 'green'
-                                                          : 'red',
-                                                  }}>
-                                                {word + ' '}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                    <div className='flex justify-center'>
-                        {!showAnswer && (
-                            <div className='flex'>
-                                <div className='mx-5 p-4'></div>
-                                <Button type={"primary"} htmlType={"submit"} size='large' className="bg-blue-500 mt-4">
-                                    Check
-                                </Button>
-                                <button type="button" className='mx-5 p-4'
-                                        onClick={!listening ? clickMic : stopMic}
-                                >
-                                    <AudioFilled style={{fontSize: 30}} className='w-10 h-10 justify-center' style={{color: listening ? "#EA580C" : 'black'}}/>
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    {!showAnswer && (
+                        <div className='flex'>
+                            <Button type={"primary"} htmlType={"submit"} size='large' className="bg-blue-500">
+                                Check
+                            </Button>
+                            <button type="button" className='mx-5'
+                                    onClick={!listening ? clickMic : stopMic}
+                            >
+                                <AudioFilled style={{fontSize: 30}} className='w-10 h-10 justify-center' style={{color: listening ? "#EA580C" : 'black'}}/>
+                            </button>
+                        </div>
+                    )}
                 </Form>
                 {showAnswer && (
-                    <div className='p-4 mx-5'>
+                    <div>
                         <Button size='large' onClick={() => setShowAnswer(false)}>
                             Hide answer
                         </Button>
                     </div>
                 )}
+                <div className='h-32'>
+                    {showAnswer && (
+                        <div>
+                            {lyric && lyric[active]?.split(' ')?.map((word, i) => {
+                                return (
+                                    <span className="font-bold text-xl"
+                                          key={i}
+                                          style={{
+                                              color: dataUserListening
+                                                  ?.filter(el => el.track === toLowerCamelCase(story))
+                                                  ?.find(lis => +lis.position === active)
+                                                  ?.text.replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
+                                                  .toLowerCase()
+                                                  .split(' ')
+                                                  .includes(
+                                                      word
+                                                          .replace(/[!@#$%^&*(),.?":{}|<>“”]/g, '')
+                                                          .toLowerCase(),
+                                                  )
+                                                  ? 'green'
+                                                  : 'red',
+                                          }}>
+                                                {word + ' '}
+                                            </span>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+                <div className='w-1/2'>
+                    {showAnswer && (
+                        <Progress className="flex justify-center font-bold" size={64} type="circle" percent={dataUserListening
+                            ?.filter(el => el.track === toLowerCamelCase(story))
+                            ?.find(el => el.position === active)?.point || 0}
+                        />
+                    )}
+                </div>
             </div>
-            <ControlListening
-                onPlay={play}
-                onPause={pause}
-                isPlaying={isPlaying}
-                setIsPlaying={setisPlaying}
-                audioElem={audioElem}
-                changeSpeedMode={changeSpeedMode}
-                active={active}
-                setActive={setActive}
-                timestamp={timestamps[toLowerCamelCase(story)]}
-                setTextInput={setTextInput}
-                setShowAnswer={setShowAnswer}
-            />
             <div className="bg-white drop-shadow mt-10 px-10 pb-10 flex flex-col items-center">
                 <audio
                     controls
