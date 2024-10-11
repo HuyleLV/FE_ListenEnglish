@@ -29,7 +29,7 @@ export default function Topic() {
 
     return (
         <>
-            <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+            <div className="max-w-screen-xl items-center mx-auto p-4 h-screen">
                 <Breadcrumb
                     className="py-5"
                     items={[

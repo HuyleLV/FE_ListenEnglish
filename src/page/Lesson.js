@@ -5,6 +5,7 @@ import {Breadcrumb, Col, Modal, Pagination, Row} from "antd";
 import Footer from "../component/Footer";
 import {useCookies} from "react-cookie";
 import dayjsInstance from "../utils/dayjs";
+import vip from "../component/image/vip.png"
 
 export default function Lesson() {
 
@@ -52,7 +53,7 @@ export default function Lesson() {
 
     return (
         <>
-            <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+            <div class="max-w-screen-xl items-center mx-auto p-4 h-screen">
                 <Breadcrumb
                     className="py-5"
                     items={[
@@ -94,20 +95,23 @@ export default function Lesson() {
                                     </div>
                                 </div>
                                 :
-                                <div className="rounded border m-2 p-2 flex">
+                                <div className='grid grid-cols-4 gap-2 rounded border m-2 p-2 bg-white flex items-center h-full'>
                                     <div className="rounded border p-1">
                                         <img src={lesson?.lesson_url} width={48}/>
                                     </div>
-                                    <div className="ml-2 flex flex-col justify-around">
-                                        <Link onClick={() => setIsModalOpen(true)}>
-                                            <p className="font-semibold text-blue-700">{lesson.title}</p>
-                                        </Link>
-                                        <div className='flex justify-between'>
+                                    <div className="ml-2 col-span-3 text-lg">
+                                        <div className="flex items-center">
                                             <Link onClick={() => setIsModalOpen(true)}>
-                                                <p className='text-xs'>Listening</p>
+                                                <p className="font-semibold text-blue-700">{lesson.title}</p>
+                                            </Link>
+                                            <img src={vip} className="w-5 ml-2" />
+                                        </div>
+                                        <div className='flex font-semibold pt-1'>
+                                            <Link onClick={() => setIsModalOpen(true)}>
+                                                <p className='text-xs border px-2 py-1 rounded hover:bg-blue-100'>Listening</p>
                                             </Link>
                                             <Link onClick={() => setIsModalOpen(true)}>
-                                                <p className='text-xs ml-2'>Speaking</p>
+                                                <p className='text-xs ml-4 border px-2 py-1 rounded hover:bg-blue-100'>Speaking</p>
                                             </Link>
                                         </div>
                                     </div>

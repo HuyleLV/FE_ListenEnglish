@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../component/image/logo.png"
+import chplay from "../component/image/chplay.png"
+import fire from "../component/image/fire.png"
 
 export default function Header() {
   const [openNav, setOpenNav] = React.useState(false);
@@ -38,11 +40,19 @@ export default function Header() {
   ];
 
   return (
-    <nav class="sticky top-0 z-10 bg-white shadow-xl border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-      <div class="max-w-screen-xl flex flex-wrap bg-white items-center justify-between mx-auto p-5">
+    <nav class="sticky top-0 z-10 bg-white shadow-lg border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div className="bg-gray-50">
+        <div className="max-w-screen-xl flex items-center justify-end mx-auto py-2">
+          <img src={fire} className="h-5 pr-2"/>
+          <img src={fire} className="h-5 pr-2"/>
+          <p className="pr-2 font-bold text-green-700">Download App</p>
+          <img src={chplay} className="h-10"/>
+        </div>
+      </div>
+      <div class="max-w-screen-xl flex flex-wrap bg-white items-center justify-between mx-auto p-2">
         <a href="/" class="flex items-center">
           <img src={logo} className="w-10 h-10 rounded-full"/>
-          <p className="pl-2 text-red-700 font-bold text-xl">Effortless English</p>
+          <p className="pl-2 text-black-800 font-bold text-xl">VuaLingo</p>
         </a>
         <button
           data-collapse-toggle="navbar-dropdown"

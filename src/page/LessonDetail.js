@@ -530,7 +530,7 @@ export default function LessonDetail() {
                         videoPlayerRef={videoPlayerRef}
                     />
                 </div>
-                <div className="py-10">
+                {/* <div className="py-10">
                     <p className="text-3xl font-semibold text-center py-10">Learning English Tutorials And Tips</p>
                     <div className="flex justify-center">
                         {!isMobile ?
@@ -577,7 +577,7 @@ export default function LessonDetail() {
                             />
                         }
                     </div>
-                </div>
+                </div> */}
             </div>
             <Modal
                 title="Thêm vào danh sách phát"

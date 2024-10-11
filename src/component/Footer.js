@@ -5,8 +5,8 @@ import { CustomerServiceOutlined, LikeOutlined, MailOutlined } from "@ant-design
 export default function Footer() {
 
   return (
-    <>
-        <div className="bg-gradient-to-r from-red-400 to-red-900 text-white">
+    <div className="float-end">
+        {/* <div className="bg-gradient-to-r from-red-400 to-red-900 text-white">
             <Row className="max-w-screen-xl items-center mx-auto p-20">
                 <Col xs={24} xl={8} className="flex">
                     <div className="px-2">
@@ -39,10 +39,13 @@ export default function Footer() {
                     </div>
                 </Col>
             </Row>
+        </div> */}
+        <div className="flex bg-black justify-center py-5 text-white">
+            <p className="pr-2 font-medium">Copyright © 2024 vualingo.com</p>
+            <a href="https://engfluent.com/terms-of-service/"><p className="font-semibold">Terms of Service</p></a>
+            <p className="px-2"> | </p>
+            <a href="https://engfluent.com/privacy-policy/"><p className="font-semibold">Privacy Policy</p></a>
         </div>
-        <div className="bg-gradient-to-r from-red-800 to-red-900 text-center">
-            <p className="text-2xl font-semibold text-white py-4">Effortless English</p>
-        </div>
-    </>
+    </div>
   );
 }

@@ -38,7 +38,7 @@ export default function Course() {
 
     return (
         <>
-            <div class="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+            <div class="max-w-screen-xl items-center mx-auto p-4 h-screen">
                 <Breadcrumb
                     className="py-5"
                     items={[

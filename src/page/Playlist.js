@@ -109,7 +109,7 @@ export default function Playlist() {
 
     return (
         <>
-            <div className="max-w-screen-xl items-center mx-auto p-4 pb-[150px]">
+            <div className="max-w-screen-xl items-center mx-auto p-4 h-screen">
                 <p className="text-4xl text-center py-10">Danh sách phát của tôi</p>
                 {cookies?.user && <Button
                     type={"primary"}

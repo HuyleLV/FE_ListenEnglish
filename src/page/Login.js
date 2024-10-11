@@ -47,7 +47,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="pb-[150px] pt-[50px]">
+      <div className="h-screen pt-[50px]">
         <div className="mb-[10px]">
           <div className="pt-[20px] text-[40px] text-[var(--red)] flex justify-center">
             Sign in
